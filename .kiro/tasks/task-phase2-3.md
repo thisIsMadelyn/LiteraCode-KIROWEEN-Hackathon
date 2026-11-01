@@ -1,7 +1,7 @@
 # task-phase2-3: `lit install` — driver registered and called by real git
 
 ## Status
-- [ ] Done
+- [x] Done
 
 ## What this is
 `lit install` does two things: writes `.gitattributes` to tell git which files

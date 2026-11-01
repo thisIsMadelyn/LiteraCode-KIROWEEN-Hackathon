@@ -30,7 +30,23 @@ badges of either kind. Changes that are neither get a plain bullet.
 - No keys, no paths that are not already public in the repo, no internal-only
   detail.
 
-## Session [2026-11-01-1600]
+## Session [2026-11-01-1700]
+
+- **Start status:** commit `f9ad7b3`, Phase 2 files committed, Scenario A branches not yet created
+- **End status:** Phase 2 gate passed; `lit install` working; Scenario A verified on real git branches; 38/38 tests green; Phase 3 next
+- **Badges:**
+  - 🆕 Addition — `src/literacode/merge.py` — three_way_merge() with full change taxonomy including reorder-vs-edit (Scenario A) and two-sided conflict (Scenario B)
+  - 🆕 Addition — `src/literacode/driver.py` — merge_driver(), conflict marker embedding, exit codes 0/1
+  - 🆕 Addition — `src/literacode/install.py` — lit install, writes .gitattributes + git config via sh wrapper
+  - 🆕 Addition — `lit_merge_driver.sh` — sh wrapper so git's sh.exe can find Python regardless of path spaces
+  - 🆕 Addition — `tests/test_merge.py` / `tests/test_driver.py` — 16 new tests
+  - Scenario A verified on `scenario-a-ours` + `scenario-a-theirs` branches; driver exits 0, order [validate,parse,fmt], parse body has theirs' strip edit
+  - `install.py` updated to write sh wrapper script (Windows-compatible)
+
+**Open:** Phase 3 (lit resolve, React UI, conflict view, agent) is next.
+
+---
+
 
 - **Start status:** commit `bc81b67`, Phase 0 active, steering files in place, model.py skeleton only, no parser/tangle/stitch
 - **End status:** Phase 1 complete, 22/22 tests green; Phase 0 items 1 and 3 retroactively ticked; Phase 2 (merge driver) is next

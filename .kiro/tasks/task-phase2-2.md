@@ -1,7 +1,7 @@
 # task-phase2-2: Reorder vs edit resolves clean → Scenario A
 
 ## Status
-- [ ] Done
+- [x] Done
 
 ## What this is
 The demo. One author reorders chunks in the narrative; the other edits a chunk

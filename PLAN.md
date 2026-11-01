@@ -50,12 +50,12 @@ Everything outside this chain is optional.
 past this. ✅ Gate passed — all 22 tests green.
 
 ### Phase 2 — the merge driver (10–16 Nov)
-- [ ] three-way diff over the model
-- [ ] reorder vs edit resolves clean → **Scenario A**
-- [ ] `lit install`, driver registered and called by real git
-- [ ] exit codes correct, conflict markers written where unresolvable
+- [x] three-way diff over the model
+- [x] reorder vs edit resolves clean → **Scenario A**
+- [x] `lit install`, driver registered and called by real git
+- [x] exit codes correct, conflict markers written where unresolvable
 
-**Gate:** Scenario A reproduces from two real branches, not a unit test.
+**Gate:** Scenario A reproduces from two real branches, not a unit test. ✅ Gate passed — `git merge scenario-a-theirs` exits 0 with correct order and body.
 
 ### Phase 3 — the human surface (17–23 Nov)
 - [ ] `lit resolve` serves the React UI
@@ -110,4 +110,5 @@ If the schedule slips, cut in this order and do not negotiate:
 Append only. One line per session: date, SHA, what moved, what is blocked.
 
 2026-11-01 · bc81b67 · 24 task breakdowns created, SESSION_HISTORY.md added, steering files populated · blocked: nothing
-2026-11-01 · Phase 1 complete · parser, tangle, stitch, losslessness gate — 22/22 tests green · Phase 2 (merge driver) next
+2026-11-01 · ca63ba0 · Phase 1 complete · parser, tangle, stitch, losslessness gate — 22/22 tests green · Phase 2 (merge driver) next
+2026-11-01 · (pending) · Phase 2 complete · merge driver, Scenario A gate on real branches · Phase 3 (resolve UI) next

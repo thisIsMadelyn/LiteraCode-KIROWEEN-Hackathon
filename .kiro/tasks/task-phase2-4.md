@@ -1,7 +1,7 @@
 # task-phase2-4: Exit codes correct, conflict markers written where unresolvable
 
 ## Status
-- [ ] Done
+- [x] Done
 
 ## What this is
 `lit merge %O %A %B %P` is what git actually calls. It must:

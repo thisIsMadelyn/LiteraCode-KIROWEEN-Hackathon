@@ -52,10 +52,29 @@ def _write_gitattributes(root: Path) -> None:
 
 
 def _register_driver(root: Path) -> None:
+    """
+    Register the literacode merge driver.
+
+    On all platforms we register a wrapper shell script so git's sh.exe
+    can invoke Python correctly regardless of spaces in the Python path.
+    """
+    import sys
+    import platform
+
+    python = sys.executable.replace("\\", "/")
+
+    # Write a small sh wrapper script in the repo root so git can call it
+    wrapper = root / "lit_merge_driver.sh"
+    wrapper.write_text(
+        f'#!/bin/sh\n"{python}" -m literacode.cli merge "$@"\nexit $?\n',
+        encoding="utf-8",
+    )
+
     subprocess.run(
         [
-            "git", "config", "--local",
-            "merge.literacode.driver", "lit merge %O %A %B %P",
+            "git", "config", "--local", "--replace-all",
+            "merge.literacode.driver",
+            "sh lit_merge_driver.sh %O %A %B %P",
         ],
         cwd=root,
         check=True,

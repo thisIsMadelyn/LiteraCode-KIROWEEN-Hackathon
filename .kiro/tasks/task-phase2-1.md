@@ -1,7 +1,7 @@
 # task-phase2-1: Three-way diff over the model
 
 ## Status
-- [ ] Done
+- [x] Done
 
 ## What this is
 The core of the merge driver. Given three `Document` objects — base, ours,
