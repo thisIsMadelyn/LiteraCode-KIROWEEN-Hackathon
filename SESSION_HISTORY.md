@@ -33,7 +33,7 @@ badges of either kind. Changes that are neither get a plain bullet.
 ## Session [2026-11-01-1700]
 
 - **Start status:** commit `f9ad7b3`, Phase 2 files committed, Scenario A branches not yet created
-- **End status:** Phase 2 gate passed; `lit install` working; Scenario A verified on real git branches; 38/38 tests green; Phase 3 next
+- **End status:** commit `f476709`, Phase 2 gate passed; `lit install` working; Scenario A verified on real git branches; 38/38 tests green; Phase 3 next
 - **Badges:**
   - 🆕 Addition — `src/literacode/merge.py` — three_way_merge() with full change taxonomy including reorder-vs-edit (Scenario A) and two-sided conflict (Scenario B)
   - 🆕 Addition — `src/literacode/driver.py` — merge_driver(), conflict marker embedding, exit codes 0/1
@@ -47,6 +47,7 @@ badges of either kind. Changes that are neither get a plain bullet.
 
 ---
 
+## Session [2026-11-01-1600]
 
 - **Start status:** commit `bc81b67`, Phase 0 active, steering files in place, model.py skeleton only, no parser/tangle/stitch
 - **End status:** Phase 1 complete, 22/22 tests green; Phase 0 items 1 and 3 retroactively ticked; Phase 2 (merge driver) is next
