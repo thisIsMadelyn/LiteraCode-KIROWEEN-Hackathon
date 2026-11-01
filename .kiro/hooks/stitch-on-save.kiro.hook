@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Stitch tangled source back into the document",
+  "description": "When a generated Python file under src/ is saved, run lit stitch so the literate document in lit/ stays the source of truth.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*.py"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A generated file under src/ was just saved.\n\nRun `lit stitch` from the repository root.\n\nThen report, in at most three lines:\n- which chunks in lit/ were updated\n- whether the round trip was lossless\n\nIf `lit stitch` exits non-zero, or reports that a sync marker is missing or malformed, STOP. Do not edit the document by hand to repair it and do not re-run the command. Report the exact error and wait.\n\nDo not change any other file. Do not commit."
+  }
+}

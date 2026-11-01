@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# literacode pre-commit guard.
+#
+# Install once:  git config core.hooksPath .githooks
+#
+# Two jobs:
+#   1. refuse to commit on main/master
+#   2. refuse to commit when the literate document and the tangled sources
+#      have drifted apart
+
+set -euo pipefail
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+if [[ "$branch" == "main" || "$branch" == "master" ]]; then
+  echo "pre-commit: refusing to commit directly on '$branch'." >&2
+  echo "            work on a feature branch." >&2
+  exit 1
+fi
+
+# Bootstrap phase: no lit/ yet, or lit not installed.
+if [[ ! -d lit ]] || ! command -v lit >/dev/null 2>&1; then
+  exit 0
+fi
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+cp -r lit "$tmp/lit-before"
+
+if ! lit stitch >/dev/null 2>&1; then
+  echo "pre-commit: 'lit stitch' failed. The document and src/ are out of sync." >&2
+  exit 1
+fi
+
+if ! diff -rq "$tmp/lit-before" lit >/dev/null 2>&1; then
+  echo "pre-commit: 'lit stitch' changed the document." >&2
+  echo "            src/ held edits that were not in lit/. They are now stitched in." >&2
+  echo "            review the diff, stage lit/, and commit again." >&2
+  exit 1
+fi
+
+exit 0

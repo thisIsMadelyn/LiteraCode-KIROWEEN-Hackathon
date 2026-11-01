@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Wrap up session",
+  "description": "End-of-session close-out: verify the literate round trip, update PLAN.md, and commit the session's work on a feature branch.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Close out this working session on literacode.\n\n## Hard rules\n\n- Never state anything you did not verify. Every claim comes from a command you ran, a diff you read, or the user's own words this session. Anything unverified goes under **Not checked**.\n- If the current branch is `main` or `master`, STOP. Report the branch and what would be committed, and wait for the user.\n- Never edit a spec's requirements.md, design.md or tasks.md here, except to tick a checkbox for work that is actually finished and verified.\n- Never rewrite a past entry in PLAN.md's log. Append only.\n\n## Steps\n\n1. Run:\n   - `git rev-parse --abbrev-ref HEAD`\n   - `git status --porcelain`\n   - `git diff --stat`\n\n2. Verify the literate round trip before anything else:\n   - `lit tangle && lit stitch && git diff --exit-code lit/`\n   - A non-empty diff in `lit/` after a clean round trip is a BUG. Report it and do not commit.\n   - If `lit` is not yet installed (bootstrap phase), say so and skip this step.\n\n3. Reconstruct what happened from the diff, not from intent. Classify each change:\n   - NEW — a capability that did not exist\n   - FIX — corrects a defect\n   - plain — a move, rename, config or docs change\n\n4. Update `PLAN.md` at the repository root:\n   - tick phase items that are genuinely done\n   - update `Status:` and `Days left:`\n   - append one dated line to the session log: what moved, what is blocked\n   - if the critical path slipped, say so explicitly and name what gets cut first\n\n5. Commit in two steps so the log entry can reference the work's own SHA:\n   - commit the work, capture its short SHA\n   - write that SHA into the PLAN.md log line\n   - commit PLAN.md\n   - one push\n\n6. Finish with a four-line summary: what shipped, what broke, what is next, days left."
+  }
+}
