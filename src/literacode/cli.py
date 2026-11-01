@@ -93,7 +93,7 @@ def cmd_stitch(args: argparse.Namespace) -> int:
 
 
 # ---------------------------------------------------------------------------
-# install  (stub — Phase 2)
+# install
 # ---------------------------------------------------------------------------
 
 def cmd_install(args: argparse.Namespace) -> int:
@@ -102,13 +102,13 @@ def cmd_install(args: argparse.Namespace) -> int:
 
 
 # ---------------------------------------------------------------------------
-# merge  (stub — Phase 2)
+# merge
 # ---------------------------------------------------------------------------
 
 def cmd_merge(args: argparse.Namespace) -> int:
     # git calls: lit merge %O %A %B %P
     # %O = base, %A = ours (write result here), %B = theirs, %P = path hint
-    from .merge import merge_driver
+    from .driver import merge_driver
     return merge_driver(
         base=Path(args.base),
         ours=Path(args.ours),
