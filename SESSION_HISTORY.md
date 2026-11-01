@@ -35,10 +35,10 @@ badges of either kind. Changes that are neither get a plain bullet.
 ## Session [2026-11-01-1503]
 
 - **Start status:** commit `6b7c3e9`, Phase 0 active, repo structure minimal (LICENSE, PLAN.md, SETUP.md, SPEC-SEEDS.md, .githooks/, .kiro/ subdirs empty)
-- **End status:** uncommitted, Phase 0 still active, 24 task breakdown files created under `.kiro/tasks/`, two steering files modified (product.md, tech.md added), SESSION_HISTORY.md created
+- **End status:** commit `bc81b67`, Phase 0 still active, 24 task breakdown files committed, SESSION_HISTORY.md committed, two steering files remain uncommitted (product.md, tech.md modifications)
 - **Badges:**
-  - 🆕 Addition — created 24 phase-task breakdown files in `.kiro/tasks/` covering all PLAN.md checkboxes (uncommitted)
-  - 🆕 Addition — populated `.kiro/steering/` with product.md and tech.md (uncommitted)
-  - 🆕 Addition — SESSION_HISTORY.md file created (uncommitted)
+  - 🆕 Addition — created 24 phase-task breakdown files in `.kiro/tasks/` covering all PLAN.md checkboxes (`5dcdc80`)
+  - 🆕 Addition — SESSION_HISTORY.md file tracking Claude sessions (`bc81b67`)
+  - Populated `.kiro/steering/` with product.md and tech.md (uncommitted)
 
-**Open:** All Phase 0 tasks remain open. The task breakdown is complete but no implementation has started. Next session should begin with Phase 0 tasks (steering completion, spec creation via Kiro, grammar decision) or move to Phase 1 implementation.
+**Open:** All Phase 0 tasks remain open. The task breakdown is complete but no implementation has started. Steering files populated but not committed. Next session should begin with Phase 0 tasks (steering completion, spec creation via Kiro, grammar decision) or move to Phase 1 implementation.

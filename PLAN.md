@@ -109,4 +109,4 @@ If the schedule slips, cut in this order and do not negotiate:
 
 Append only. One line per session: date, SHA, what moved, what is blocked.
 
-<!-- 2026-11-01 · <sha> · scope locked, Kiro setup in place · blocked: nothing -->
+2026-11-01 · bc81b67 · 24 task breakdowns created, SESSION_HISTORY.md added, steering files populated · blocked: nothing
