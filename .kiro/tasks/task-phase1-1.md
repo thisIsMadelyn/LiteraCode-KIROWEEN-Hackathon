@@ -1,7 +1,7 @@
 # task-phase1-1: Parser — document → model (prose sections, chunks with ids, references)
 
 ## Status
-- [ ] Done
+- [x] Done
 
 ## What this is
 The foundation of everything. A Python function that reads a `.md` file and

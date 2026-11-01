@@ -1,7 +1,7 @@
 # task-phase0-3: Format grammar decided and written down
 
 ## Status
-- [ ] Done
+- [x] Done
 
 ## What this is
 Before writing a single line of parser code, the chunk attribute syntax must be

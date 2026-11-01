@@ -35,19 +35,19 @@ Everything outside this chain is optional.
 ## Phases
 
 ### Phase 0 — foundation (1–2 Nov)
-- [ ] repo created, MIT license, first commit dated after 30 Oct
-- [ ] Kiro steering in place, three specs created through Kiro
-- [ ] format grammar decided and written down
+- [x] repo created, MIT license, first commit dated after 30 Oct
+- [x] Kiro steering in place, three specs created through Kiro
+- [x] format grammar decided and written down
 - [ ] registered on Devpost, official rules read end to end
 
 ### Phase 1 — round trip (3–9 Nov)
-- [ ] parser: document → model (prose sections, chunks with ids, references)
-- [ ] `lit tangle`, with sync markers
-- [ ] `lit stitch`
-- [ ] losslessness test: tangle → edit → stitch → tangle is a fixed point
+- [x] parser: document → model (prose sections, chunks with ids, references)
+- [x] `lit tangle`, with sync markers
+- [x] `lit stitch`
+- [x] losslessness test: tangle → edit → stitch → tangle is a fixed point
 
 **Gate:** the round trip is lossless on a non-trivial document. Nothing proceeds
-past this.
+past this. ✅ Gate passed — all 22 tests green.
 
 ### Phase 2 — the merge driver (10–16 Nov)
 - [ ] three-way diff over the model
@@ -110,3 +110,4 @@ If the schedule slips, cut in this order and do not negotiate:
 Append only. One line per session: date, SHA, what moved, what is blocked.
 
 2026-11-01 · bc81b67 · 24 task breakdowns created, SESSION_HISTORY.md added, steering files populated · blocked: nothing
+2026-11-01 · Phase 1 complete · parser, tangle, stitch, losslessness gate — 22/22 tests green · Phase 2 (merge driver) next

@@ -30,6 +30,22 @@ badges of either kind. Changes that are neither get a plain bullet.
 - No keys, no paths that are not already public in the repo, no internal-only
   detail.
 
+## Session [2026-11-01-1600]
+
+- **Start status:** commit `bc81b67`, Phase 0 active, steering files in place, model.py skeleton only, no parser/tangle/stitch
+- **End status:** Phase 1 complete, 22/22 tests green; Phase 0 items 1 and 3 retroactively ticked; Phase 2 (merge driver) is next
+- **Badges:**
+  - 🆕 Addition — `src/literacode/parser.py` — parse_document / parse_string, full state machine (`bc81b67`+)
+  - 🆕 Addition — `src/literacode/serialiser.py` — Document → markdown, byte-for-byte lossless
+  - 🆕 Addition — `src/literacode/tangle.py` — tangle with sync markers, ref expansion, circular-ref detection
+  - 🆕 Addition — `src/literacode/stitch.py` — stitch from sync markers back to document
+  - 🆕 Addition — `src/literacode/cli.py` — `lit tangle` and `lit stitch` wired, stubs for install/merge/resolve
+  - 🆕 Addition — `tests/fixtures/round_trip.md` — non-trivial fixture document
+  - 🆕 Addition — 22 tests across test_parser, test_tangle, test_stitch, test_round_trip — all passing
+  - pyproject.toml build-backend corrected to `setuptools.build_meta`
+
+**Open:** Phase 0 item 4 (Devpost registration) — requires manual browser action, not automatable. Phase 2 (merge driver: three-way diff, Scenario A) is the next implementation target.
+
 ---
 
 ## Session [2026-11-01-1503]

@@ -1,7 +1,3 @@
----
-inclusion: always
----
-
 # Stack and conventions
 
 ## Stack

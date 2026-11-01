@@ -1,7 +1,7 @@
 # task-phase1-2: `lit tangle` — model to `.py` files on disk, with sync markers
 
 ## Status
-- [ ] Done
+- [x] Done
 
 ## What this is
 The forward direction of the round trip. Given a parsed document, `lit tangle`

@@ -1,7 +1,7 @@
 # task-phase1-3: `lit stitch` — edited `.py` files back into the document
 
 ## Status
-- [ ] Done
+- [x] Done
 
 ## What this is
 The reverse direction. After a developer edits a tangled `.py` file, `lit stitch`

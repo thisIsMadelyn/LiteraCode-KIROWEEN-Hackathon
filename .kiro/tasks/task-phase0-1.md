@@ -1,7 +1,7 @@
 # task-phase0-1: Repo created, MIT license, first commit dated after 30 Oct
 
 ## Status
-- [ ] Done
+- [x] Done
 
 ## What this is
 Confirm that the git repository exists, has an MIT license file, and the initial

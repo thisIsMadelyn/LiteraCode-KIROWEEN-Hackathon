@@ -1,7 +1,7 @@
 # task-phase1-4: Losslessness test — tangle → edit → stitch → tangle is a fixed point
 
 ## Status
-- [ ] Done
+- [x] Done
 
 ## What this is
 The Phase 1 gate. A single automated test that proves the round trip is lossless
