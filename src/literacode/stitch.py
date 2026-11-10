@@ -27,38 +27,26 @@ def _split_regions(text: str) -> list[tuple[str, str, str]]:
     """
     Split a tangled .py file into regions at sync marker lines.
 
-    Returns a list of (id, src, body) triples.
-    Empty leading content (before the first marker) is ignored — it would be
-    a hand-edit above all chunks, which we cannot stitch.
+    Returns a list of (id, src, body) triples.  Content before the first
+    marker is ignored — it would be a hand-edit above all chunks, which we
+    cannot stitch.
     """
     regions: list[tuple[str, str, str]] = []
-    current_id: str | None = None
-    current_src: str | None = None
+    current: tuple[str, str] | None = None
     body_lines: list[str] = []
 
-    lines = text.splitlines(keepends=True)
-
-    def flush() -> None:
-        if current_id is not None:
-            # Strip a single trailing blank line added as separator by tangle
-            body = "".join(body_lines)
-            # tangle adds "" + "\n".join() so there may be a trailing \n\n;
-            # we want to keep exactly what was between the marker and the next
-            # marker.  The separator blank line is not part of the chunk body.
-            regions.append((current_id, current_src or "", body))
-            body_lines.clear()
-
-    for line in lines:
+    for line in text.splitlines(keepends=True):
         m = MARKER_RE.match(line.rstrip("\n\r"))
         if m:
-            flush()
-            current_id = m.group(1)
-            current_src = m.group(2)
-            body_lines.clear()
-        elif current_id is not None:
+            if current is not None:
+                regions.append((*current, "".join(body_lines)))
+            current = (m.group(1), m.group(2))
+            body_lines = []
+        elif current is not None:
             body_lines.append(line)
 
-    flush()
+    if current is not None:
+        regions.append((*current, "".join(body_lines)))
     return regions
 
 
@@ -72,45 +60,23 @@ def stitch(py_path: Path, doc_path: Path) -> None:
 
     Raises:
         StitchError: if any sync marker references an id not in the document,
-                     or references a different source document, or duplicate ids.
+                     names a different source document, or repeats an id.
     """
-    py_text = py_path.read_text(encoding="utf-8", newline="")
-    regions = _split_regions(py_text)
-
+    regions = _split_regions(py_path.read_text(encoding="utf-8", newline=""))
     if not regions:
-        # No sync markers — nothing to do
-        return
+        return  # no sync markers — nothing to do
 
-    # Normalise doc_path for comparison (same normalisation as tangle)
-    try:
-        # Try to compare relative to py_path's parent or a known root;
-        # we just check str representation matches
-        pass
-    except ValueError:
-        pass
-
-    doc_text = doc_path.read_text(encoding="utf-8", newline="")
-    doc = parse_string(doc_text)
-
+    doc = parse_string(doc_path.read_text(encoding="utf-8", newline=""))
     seen_ids: set[str] = set()
 
     for chunk_id, src, new_body in regions:
-        # Check src matches doc_path
-        # tangle writes forward-slash paths; normalise for comparison
-        src_norm = src.replace("\\", "/")
-        # Accept exact match or basename match to handle cwd differences
-        doc_str = str(doc_path).replace("\\", "/")
-        if src_norm != doc_str and not doc_str.endswith("/" + src_norm) and not src_norm.endswith("/" + doc_str):
-            # Try comparing just relative suffix
-            # Allow if src is a suffix of doc_path or vice versa at path boundaries
-            src_parts = src_norm.lstrip("/").split("/")
-            doc_parts = doc_str.lstrip("/").split("/")
-            min_len = min(len(src_parts), len(doc_parts))
-            if src_parts[-min_len:] != doc_parts[-min_len:]:
-                raise StitchError(
-                    f"Sync marker in {py_path} has src={src!r} but "
-                    f"stitching into {doc_path!r}"
-                )
+        # Tangle writes src relative to its output root, so only the file
+        # name is comparable independent of the working directory.
+        if Path(src.replace("\\", "/")).name != doc_path.name:
+            raise StitchError(
+                f"Sync marker in {py_path} has src={src!r} but "
+                f"stitching into {doc_path!r}"
+            )
 
         if chunk_id in seen_ids:
             raise StitchError(
@@ -125,17 +91,8 @@ def stitch(py_path: Path, doc_path: Path) -> None:
                 f"exist in {doc_path}"
             )
 
-        # Strip the separator blank lines tangle adds between regions.
-        # tangle writes: marker\nbody\n[\n]marker\n...
-        # body already ends in \n; tangle's join adds more blank lines.
-        # Normalise: rstrip trailing newlines, then add exactly one back.
-        body = new_body.rstrip("\n")
-        if body:
-            body += "\n"
-        else:
-            body = "\n"  # preserve empty bodies
+        # Tangle separates regions with blank lines that are not part of the
+        # chunk body: strip trailing newlines, then restore exactly one.
+        chunk.body = new_body.rstrip("\n") + "\n"
 
-        chunk.body = body
-
-    # Serialise back to disk
     doc_path.write_text(serialise(doc), encoding="utf-8", newline="")
