@@ -4,8 +4,8 @@
 work live in `.kiro/specs/<spec>/tasks.md`. Never duplicate a task across both.**
 
 Deadline: **Fri 4 Dec 2026, 14:00 PT = Sat 5 Dec 00:00 Athens**
-Status: Phase 0
-Days left: 33
+Status: Phase 3
+Days left: 24
 
 ---
 
@@ -38,7 +38,7 @@ Everything outside this chain is optional.
 - [x] repo created, MIT license, first commit dated after 30 Oct
 - [x] Kiro steering in place, three specs created through Kiro
 - [x] format grammar decided and written down
-- [ ] registered on Devpost, official rules read end to end
+- [x] registered on Devpost, official rules read end to end
 
 ### Phase 1 — round trip (3–9 Nov)
 - [x] parser: document → model (prose sections, chunks with ids, references)
@@ -112,3 +112,4 @@ Append only. One line per session: date, SHA, what moved, what is blocked.
 2026-11-01 · bc81b67 · 24 task breakdowns created, SESSION_HISTORY.md added, steering files populated · blocked: nothing
 2026-11-01 · ca63ba0 · Phase 1 complete · parser, tangle, stitch, losslessness gate — 22/22 tests green · Phase 2 (merge driver) next
 2026-11-01 · 9e0946c · Phase 2 complete · merge driver, Scenario A gate on real branches · Phase 3 (resolve UI) next
+2026-11-10 · 960ef25 · simplification pass on branch simplify-core · fixed no-op driver (missing __main__ guard), merge.py and stitch.py slimmed, wrapper script removed · open: theirs-side prose edits dropped by merge, simplify-core not yet merged to main · Phase 3 (resolve UI) next
