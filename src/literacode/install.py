@@ -5,8 +5,12 @@ Writes .gitattributes and registers the driver in .git/config.
 """
 from __future__ import annotations
 
+import shlex
 import subprocess
+import sys
 from pathlib import Path
+
+GITATTRIBUTES_LINE = "*.md merge=literacode\n"
 
 
 def install(repo_root: Path) -> int:
@@ -37,44 +41,32 @@ def install(repo_root: Path) -> int:
 
 def _write_gitattributes(root: Path) -> None:
     ga = root / ".gitattributes"
-    line = "*.md merge=literacode\n"
-    if ga.exists():
-        existing = ga.read_text(encoding="utf-8")
-        if "merge=literacode" in existing:
-            return  # already present, idempotent
-        # Append, ensuring a newline separator
-        ga.write_text(
-            existing.rstrip("\n") + "\n" + line,
-            encoding="utf-8",
-        )
-    else:
-        ga.write_text(line, encoding="utf-8")
+    if not ga.exists():
+        ga.write_text(GITATTRIBUTES_LINE, encoding="utf-8")
+        return
+    existing = ga.read_text(encoding="utf-8")
+    if "merge=literacode" in existing:
+        return  # already present, idempotent
+    ga.write_text(existing.rstrip("\n") + "\n" + GITATTRIBUTES_LINE, encoding="utf-8")
+
+
+def _driver_command() -> str:
+    """
+    The command git runs for a merge.
+
+    Uses the interpreter that ran ``lit install`` rather than relying on
+    ``lit`` being on PATH when git invokes the driver.  git runs this through
+    ``sh``, so the interpreter path is shell-quoted.
+    """
+    python = shlex.quote(sys.executable.replace("\\", "/"))
+    return f"{python} -m literacode.cli merge %O %A %B %P"
 
 
 def _register_driver(root: Path) -> None:
-    """
-    Register the literacode merge driver.
-
-    On all platforms we register a wrapper shell script so git's sh.exe
-    can invoke Python correctly regardless of spaces in the Python path.
-    """
-    import sys
-    import platform
-
-    python = sys.executable.replace("\\", "/")
-
-    # Write a small sh wrapper script in the repo root so git can call it
-    wrapper = root / "lit_merge_driver.sh"
-    wrapper.write_text(
-        f'#!/bin/sh\n"{python}" -m literacode.cli merge "$@"\nexit $?\n',
-        encoding="utf-8",
-    )
-
     subprocess.run(
         [
             "git", "config", "--local", "--replace-all",
-            "merge.literacode.driver",
-            "sh lit_merge_driver.sh %O %A %B %P",
+            "merge.literacode.driver", _driver_command(),
         ],
         cwd=root,
         check=True,
