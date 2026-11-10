@@ -32,7 +32,6 @@ def _doc(*chunks: tuple[str, str, str | None]) -> Document:
             file=file,
             lang="python",
             body=body,
-            refs=[],
             _fence_attrs=f" id={cid}" + (f" file={file}" if file else ""),
         ))
     return Document(nodes=nodes)

@@ -22,7 +22,6 @@ class Chunk:
     file: str | None   # target output path for tangle; None if not a tangle target
     lang: str          # language tag (e.g. "python")
     body: str          # code body — no fence lines; trailing newline preserved
-    refs: list[str] = field(default_factory=list)  # ids found via <<id>> in body
 
     # The raw attribute string from the opening fence line, e.g.
     # "python id=foo file=bar.py".  Stored so the serialiser can reproduce the
