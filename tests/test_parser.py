@@ -54,16 +54,6 @@ def test_plain_fence_is_prose():
     assert "```python" in doc.nodes[0].text
 
 
-def test_chunk_refs():
-    md = (
-        "```python id=uses-ref\n"
-        "<<other>>\n"
-        "```\n"
-    )
-    doc = parse_string(md)
-    assert doc.chunks()[0].refs == ["other"]
-
-
 def test_fixture_parses():
     doc = parse_document(FIXTURE)
     chunks = doc.chunks()

@@ -30,6 +30,22 @@ badges of either kind. Changes that are neither get a plain bullet.
 - No keys, no paths that are not already public in the repo, no internal-only
   detail.
 
+## Session [2026-11-10-1406]
+
+- **Start status:** commit `755a26b` on `main`, Phase 2 gate passed, 38/38 tests green, Phase 3 next
+- **End status:** branch `simplify-core` at `960ef25`, 37/37 tests green, Phase 3 not started
+- **Badges:**
+  - 🐛 Bug fix — `python -m literacode.cli` had no `__main__` guard, so the git driver wrapper exited 0 without merging; Scenario A re-verified on real git (plain git conflicts, driver merges clean) (`ccd3054`)
+  - 🐛 Bug fix — `lit stitch` crashed on a non-UTF console printing `→`; printed output is now ASCII (`ccd3054`)
+  - `merge.py` collapsed from 263 to 118 lines: one per-chunk resolve rule, deterministic conflict order; checked against the old implementation on 20,000 random documents with 0 differences (`393ee49`)
+  - `stitch.py` simplified from 113 to 76 lines; fuzzy `src` path check replaced by a basename check (`205c17d`)
+  - Merge driver now registered directly as `<python> -m literacode.cli merge`; `lit_merge_driver.sh` removed (`80727a7`)
+  - Removed unused `Chunk.refs` and `driver.merge_driver_on_docs`; one test removed (`960ef25`)
+
+**Open:** Prose edits made only on the "theirs" side are dropped by the merge (prose is taken from ours). Four-backtick fences, CRLF closing fences and trailing blank lines in a stitched chunk body are not lossless. No `.gitignore`, and `core.autocrlf` behaviour is undecided. `ruff` was not run (not installed). `simplify-core` is not merged to `main`. Phase 3 (`lit resolve`) is next.
+
+---
+
 ## Session [2026-11-01-1700]
 
 - **Start status:** commit `f9ad7b3`, Phase 2 files committed, Scenario A branches not yet created

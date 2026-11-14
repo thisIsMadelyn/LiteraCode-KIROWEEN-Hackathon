@@ -19,9 +19,6 @@ FENCE_OPEN_RE = re.compile(r"^(```+)(\w+)([ \t].*)?\s*$")
 # Key=value tokens in the attribute string
 ATTR_RE = re.compile(r"([\w-]+)=(\S+)")
 
-# References inside a chunk body: <<chunk-id>>
-REF_RE = re.compile(r"<<([\w-]+)>>")
-
 
 def _parse_attrs(attr_str: str) -> dict[str, str]:
     """Return {key: value} from a space-separated key=value string."""
@@ -60,15 +57,12 @@ def parse_string(text: str) -> Document:
             prose_lines.clear()
 
     def flush_chunk() -> None:
-        body = "".join(chunk_lines)
-        refs = REF_RE.findall(body)
         doc.nodes.append(
             Chunk(
                 id=current_id,
                 file=current_file,
                 lang=current_lang,
-                body=body,
-                refs=refs,
+                body="".join(chunk_lines),
                 _fence_attrs=current_attrs_raw,
             )
         )

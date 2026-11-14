@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from literacode.driver import merge_driver, merge_driver_on_docs
+from literacode.driver import merge_driver
 from literacode.model import Chunk
 from literacode.parser import parse_document, parse_string
 

@@ -9,8 +9,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from .merge import Conflict, MergeResult
-from .model import Chunk, Prose
+from .merge import MergeResult, three_way_merge
+from .model import Chunk
 from .parser import parse_document
 from .serialiser import serialise
 
@@ -78,7 +78,7 @@ def merge_driver(
     ours_doc   = parse_document(ours)
     theirs_doc = parse_document(theirs)
 
-    result = merge_driver_on_docs(base_doc, ours_doc, theirs_doc)
+    result = three_way_merge(base_doc, ours_doc, theirs_doc)
 
     # Embed conflict markers into the document before serialising
     if result.conflicts:
@@ -96,9 +96,3 @@ def merge_driver(
         return 1
 
     return 0
-
-
-def merge_driver_on_docs(base_doc, ours_doc, theirs_doc):
-    """Thin wrapper so tests can call without touching disk."""
-    from .merge import three_way_merge
-    return three_way_merge(base_doc, ours_doc, theirs_doc)
