@@ -33,7 +33,7 @@ badges of either kind. Changes that are neither get a plain bullet.
 ## Session [2026-11-14-1200]
 
 - **Start status:** branch `simplify-core` at `39d89b1`, 37/37 tests green, not merged to `main`
-- **End status:** `main`, 42/42 tests green, Phase 3 in progress (server done, React UI not started)
+- **End status:** `main`, 55/55 tests green, Phase 3 built, gate pending a browser pass
 - **Badges:**
   - simplify-core merged to `main` (merge commit)
   - 🐛 Bug fix — theirs-side prose edits were dropped by the merge; prose now merges per slot (the prose before each chunk), and edits on both sides conflict with git-style markers (`00d9089`)
@@ -41,8 +41,9 @@ badges of either kind. Changes that are neither get a plain bullet.
   - 🆕 Addition — `tests/test_resolve.py` and three prose-merge tests (`9516c6b`)
   - 🆕 Addition — `ui/`: Vite + React app with base/ours/theirs columns, prose context, changed-line highlighting, editable resolution area, prev/next and jump navigation; checked in a headless browser at 1280px
   - 🆕 Addition — `src/literacode/propose.py` and `POST /api/propose`: runs the conflict-resolver agent prompt through OpenAI or Anthropic (stdlib HTTP), falls back to an ours-body stub with a visible note; UI shows the proposal as a diff against Ours with Accept / Edit / Reject. The endpoint never writes the document. 7 new tests with the provider mocked
+  - 🆕 Addition — `POST /api/resolve` and the Resolve button: writes the chosen body, drops `lit:conflict` from the fence, replaces the file atomically via a `.lit_resolved` temp file, answers 409 if the file changed since the server started, refuses empty bodies and bodies that still hold conflict markers, stops the server 3 s after the last conflict, and the UI then shows `git add <file>`. 6 new tests. Scenario B driven over the HTTP API on a real git merge, ending in a clean `git commit`
 
-**Open:** The React app (`ui/`) has the three-column view only: no Resolve button. `ui/dist` is gitignored (`dist/`), so it must be built with `npm run build` in `ui/`. `/api/resolve` not written. The agent call has not been run against a live provider, and the Accept/Edit/Reject buttons were not clicked in a browser (diff logic and endpoint tested only). Prose conflicts are not shown in `lit resolve`; they must be fixed by hand. `npm` is blocked by PowerShell execution policy (use `npm.cmd`). `ruff` not run.
+**Open:** The React app (`ui/`) has the three-column view only: no Resolve button. `ui/dist` is gitignored (`dist/`), so it must be built with `npm run build` in `ui/`. The Phase 3 gate is not signed off: the UI buttons (Resolve, Accept, Edit, Reject) were never clicked in a browser. No `.lit_resolved` backup of the original is kept; the original stays recoverable from git index stages. The agent call has not been run against a live provider, and the Accept/Edit/Reject buttons were not clicked in a browser (diff logic and endpoint tested only). Prose conflicts are not shown in `lit resolve`; they must be fixed by hand. `npm` is blocked by PowerShell execution policy (use `npm.cmd`). `ruff` not run.
 
 ## Session [2026-11-10-1406]
 

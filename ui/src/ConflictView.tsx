@@ -6,6 +6,7 @@ interface Props {
   conflict: Conflict;
   resolution: string;
   onResolutionChange: (value: string) => void;
+  onResolve: () => Promise<string | null>;
 }
 
 function Column({ title, side, base }: { title: string; side: Side; base?: Side }) {
@@ -32,7 +33,14 @@ function Column({ title, side, base }: { title: string; side: Side; base?: Side 
   );
 }
 
-export default function ConflictView({ conflict, resolution, onResolutionChange }: Props) {
+export default function ConflictView({
+  conflict,
+  resolution,
+  onResolutionChange,
+  onResolve,
+}: Props) {
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,6 +61,16 @@ export default function ConflictView({ conflict, resolution, onResolutionChange 
       setError((e as Error).message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function resolveNow() {
+    setSaving(true);
+    setSaveError(null);
+    const err = await onResolve();
+    if (err) {
+      setSaveError(err);
+      setSaving(false);
     }
   }
 
@@ -126,6 +144,12 @@ export default function ConflictView({ conflict, resolution, onResolutionChange 
           rows={Math.max(6, resolution.split("\n").length + 1)}
           onChange={(e) => onResolutionChange(e.target.value)}
         />
+        {saveError && <p role="alert">Could not resolve: {saveError}</p>}
+        <div className="actions">
+          <button onClick={resolveNow} disabled={!resolution.trim() || saving}>
+            {saving ? "Writing…" : "Resolve"}
+          </button>
+        </div>
       </section>
     </main>
   );

@@ -7,6 +7,8 @@ binds to 127.0.0.1, no auth, no deployment.
 API:
     GET|POST /api/conflicts   conflicted chunks with base/ours/theirs context
     POST /api/propose         {chunk_id} -> agent proposal (read-only; see propose.py)
+    GET  /api/file            {name} of the document being resolved
+    POST /api/resolve         {chunk_id, body} -> {remaining, prose_conflicts}
 
 Base and theirs come from git's index stages (``:1:``, ``:3:``) when the file
 is mid-merge; the working-tree copy supplies ours.  Outside a merge, only the
@@ -14,8 +16,11 @@ working copy is available and base/theirs are reported as empty.
 """
 from __future__ import annotations
 
+import hashlib
 import http.server
 import json
+import os
+import re
 import subprocess
 import sys
 import threading
@@ -23,7 +28,8 @@ import webbrowser
 from pathlib import Path
 
 from .model import Chunk, Document, Prose
-from .parser import parse_string
+from .parser import parse_document, parse_string
+from .serialiser import serialise
 
 CONFLICT_ATTR = "lit:conflict"
 
@@ -35,8 +41,9 @@ _PLACEHOLDER = (
 
 
 class ResolveError(Exception):
-    pass
-
+    def __init__(self, message: str, status: int = 400):
+        super().__init__(message)
+        self.status = status
 
 def is_conflicted(chunk: Chunk) -> bool:
     return CONFLICT_ATTR in chunk._fence_attrs.split()
@@ -129,7 +136,61 @@ def load_conflicts(doc_path: Path) -> list[dict]:
     return result
 
 
-def _make_handler(doc_path: Path, static_root: Path):
+_MARKER_LINE = re.compile(r"^(<<<<<<< |=======$|>>>>>>> )", re.M)
+
+
+def file_hash(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def resolve_chunk(doc_path: Path, chunk_id: str, body: str, expected_hash: str) -> dict:
+    """
+    Write ``body`` as the resolution of one conflicted chunk.
+
+    Refuses (ResolveError) if the file changed since ``expected_hash``, the
+    chunk is not a known conflict, or the body is empty or still contains
+    conflict markers. The file is replaced atomically via a temp file.
+    Returns {remaining, prose_conflicts, hash}.
+    """
+    if file_hash(doc_path) != expected_hash:
+        raise ResolveError(
+            "document changed on disk since lit resolve started; "
+            "restart lit resolve", 409,
+        )
+    if not isinstance(body, str) or not body.strip():
+        raise ResolveError("resolution is empty")
+    if _MARKER_LINE.search(body):
+        raise ResolveError("resolution still contains conflict markers")
+
+    doc = parse_document(doc_path)
+    chunk = next(
+        (c for c in doc.chunks() if c.id == chunk_id and is_conflicted(c)), None
+    )
+    if chunk is None:
+        raise ResolveError(f"no conflicted chunk '{chunk_id}'", 404)
+
+    chunk.body = body if body.endswith("\n") else body + "\n"
+    chunk._fence_attrs = " ".join(
+        a for a in chunk._fence_attrs.split(" ") if a != CONFLICT_ATTR
+    )
+    text = serialise(doc)
+
+    tmp = doc_path.with_name(doc_path.name + ".lit_resolved")
+    tmp.write_text(text, encoding="utf-8", newline="")
+    os.replace(tmp, doc_path)
+
+    left = parse_document(doc_path)
+    return {
+        "remaining": sum(is_conflicted(c) for c in left.chunks()),
+        "prose_conflicts": sum(
+            len(re.findall(r"^<<<<<<< ", n.text, re.M))
+            for n in left.nodes if isinstance(n, Prose)
+        ),
+        "hash": file_hash(doc_path),
+    }
+
+
+def _make_handler(doc_path: Path, static_root: Path, state: dict):
     class Handler(http.server.BaseHTTPRequestHandler):
         def log_message(self, fmt, *args):  # keep the terminal quiet
             pass
@@ -145,6 +206,9 @@ def _make_handler(doc_path: Path, static_root: Path):
             self._send(status, json.dumps(payload).encode(), "application/json")
 
         def _api(self) -> bool:
+            if self.path.split("?")[0] == "/api/file":
+                self._json(200, {"name": doc_path.name})
+                return True
             if self.path.split("?")[0] == "/api/conflicts":
                 try:
                     self._json(200, load_conflicts(doc_path))
@@ -169,9 +233,35 @@ def _make_handler(doc_path: Path, static_root: Path):
 
             self._json(200, propose(match[0]))
 
+        def _resolve(self) -> None:
+            """POST /api/resolve {chunk_id, body}: the only route that writes."""
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+                req = json.loads(self.rfile.read(length) or b"{}")
+                chunk_id, body = req["chunk_id"], req["body"]
+            except (ValueError, KeyError, TypeError) as e:
+                self._json(400, {"error": f"bad request: {e}"})
+                return
+            with state["lock"]:
+                try:
+                    out = resolve_chunk(doc_path, chunk_id, body, state["hash"])
+                except ResolveError as e:
+                    self._json(e.status, {"error": str(e)})
+                    return
+                except OSError as e:
+                    self._json(500, {"error": str(e)})
+                    return
+                state["hash"] = out.pop("hash")
+            self._json(200, out)
+            if out["remaining"] == 0:
+                # Let the response flush, then stop the server.
+                threading.Timer(3.0, self.server.shutdown).start()
+
         def do_POST(self):
             if self.path.split("?")[0] == "/api/propose":
                 self._propose()
+            elif self.path.split("?")[0] == "/api/resolve":
+                self._resolve()
             elif not self._api():
                 self._json(404, {"error": "not found"})
 
@@ -197,8 +287,9 @@ def _make_handler(doc_path: Path, static_root: Path):
 def make_server(doc_path: Path, port: int, static_root: Path | None = None):
     if static_root is None:
         static_root = Path(__file__).resolve().parents[2] / "ui" / "dist"
+    state = {"hash": file_hash(doc_path), "lock": threading.Lock()}
     return http.server.ThreadingHTTPServer(
-        ("127.0.0.1", port), _make_handler(doc_path, static_root)
+        ("127.0.0.1", port), _make_handler(doc_path, static_root, state)
     )
 
 

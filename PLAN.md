@@ -61,7 +61,7 @@ past this. ✅ Gate passed — all 22 tests green.
 - [ ] `lit resolve` serves the React UI
 - [x] three-way chunk view with surrounding prose
 - [x] conflict-resolver agent wired in, output is a reviewable diff
-- [ ] accept / reject / hand-edit, writes the resolution
+- [x] accept / reject / hand-edit, writes the resolution
 
 **Gate:** Scenario B works end to end.
 
@@ -116,3 +116,4 @@ Append only. One line per session: date, SHA, what moved, what is blocked.
 2026-11-14 · 00d9089 · simplify-core merged to main; prose now merged per slot (theirs-side prose edits kept, both-sided prose edits conflict); lit resolve server + /api/conflicts done (task 3-1 server half, React app not started) · Phase 3 continues
 2026-11-14 · 4800d3f · React UI (ui/, Vite) with three-column view, line highlighting, prev/next and jump nav; screenshot-checked at 1280px · open: agent, resolve button and /api/resolve · next: tasks 3-3, 3-4
 2026-11-14 · be4b41e · /api/propose + agent call (OpenAI/Anthropic/stub) + proposal diff with Accept/Edit/Reject in UI · open: not exercised against a live provider, Resolve button and /api/resolve · next: task 3-4
+2026-11-14 · 738af7b · /api/resolve + Resolve button + all-done screen; Scenario B driven through the HTTP API on a real git merge (conflict, propose, resolve, git add, commit) · open: Phase 3 gate not signed off, UI buttons never clicked in a browser, agent never run against a live provider · next: manual browser pass, then Phase 4
