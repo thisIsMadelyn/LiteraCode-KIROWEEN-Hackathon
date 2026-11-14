@@ -84,7 +84,7 @@ For agent proposals, set `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`. With neither,
 - A fence without `id=` is prose, and so is everything inside it.
 - `<<other-id>>` inside a chunk is expanded at tangle time. There is no escape
   for a literal one yet.
-- The grammar is in [`lit/format-grammar.md`](lit/format-grammar.md).
+- The specification is in [`lit/format.md`](lit/format.md), the same document that the parser is tangled from.
 
 ## Where things stand
 

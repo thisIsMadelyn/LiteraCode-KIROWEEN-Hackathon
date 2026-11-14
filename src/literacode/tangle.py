@@ -6,7 +6,7 @@ For each unique `file=` target in the document, writes one .py file.
 Each chunk region is preceded by a sync marker comment so stitch can
 find its way back.
 
-Sync marker format (from format-grammar.md §4):
+Sync marker format (from lit/format.md, section 4):
     # lit:chunk id=<id> src=<doc_path>
 """
 from __future__ import annotations
