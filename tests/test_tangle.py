@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from literacode.parser import parse_string, parse_document
-from literacode.tangle import tangle, TangleError
+from literacode.tangle import TangleError, render, tangle
 
 FIXTURE = Path(__file__).parent / "fixtures" / "round_trip.md"
 
@@ -89,3 +89,15 @@ def test_tangle_circular_ref_raises(tmp_path: Path):
     doc = parse_string(md)
     with pytest.raises(TangleError, match="Circular"):
         tangle(doc, tmp_path / "fake.md", tmp_path)
+
+
+def test_stale_detects_drift_and_clears_after_tangle(tmp_path):
+    from literacode.tangle import stale
+
+    doc = parse_document(FIXTURE)
+    assert stale(doc, FIXTURE, tmp_path)  # nothing written yet
+    tangle(doc, FIXTURE, tmp_path)
+    assert stale(doc, FIXTURE, tmp_path) == []
+    target = next(iter(render(doc, FIXTURE, tmp_path)))
+    target.write_text("# edited\n", encoding="utf-8")
+    assert stale(doc, FIXTURE, tmp_path) == [target]

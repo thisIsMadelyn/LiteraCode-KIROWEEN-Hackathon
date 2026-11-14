@@ -7,6 +7,7 @@ import pytest
 
 from literacode.model import Chunk, Document, Prose
 from literacode.parser import parse_document, parse_string
+from literacode.serialiser import serialise
 
 FIXTURE = Path(__file__).parent / "fixtures" / "round_trip.md"
 
@@ -71,3 +72,13 @@ def test_fixture_parses():
 def test_get_chunk_missing():
     doc = parse_string("# nothing\n")
     assert doc.get_chunk("nope") is None
+
+
+def test_plain_fence_body_is_prose_even_if_it_looks_like_a_chunk():
+    text = (
+        "Example:\n\n```\n```python id=x file=x.py\n```\n\nAfter.\n\n"
+        "```python id=real\ny = 1\n```\n"
+    )
+    doc = parse_string(text)
+    assert [c.id for c in doc.chunks()] == ["real"]
+    assert serialise(doc) == text

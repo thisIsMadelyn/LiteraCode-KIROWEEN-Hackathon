@@ -1,3 +1,4 @@
+# lit:chunk id=merge-header src=lit/merge.md
 """
 literacode three-way merge — model level.
 
@@ -24,6 +25,7 @@ from dataclasses import dataclass, field, replace
 from .model import Chunk, Document, Prose
 
 
+# lit:chunk id=Conflict src=lit/merge.md
 @dataclass
 class Conflict:
     """A chunk that was changed incompatibly on both sides."""
@@ -34,6 +36,7 @@ class Conflict:
     kind: str = "chunk"         # "chunk" or "prose" (then chunk_id is the slot key)
 
 
+# lit:chunk id=MergeResult src=lit/merge.md
 @dataclass
 class MergeResult:
     """Output of three_way_merge()."""
@@ -45,6 +48,7 @@ class MergeResult:
         return len(self.conflicts) == 0
 
 
+# lit:chunk id=_resolve src=lit/merge.md
 def _resolve(
     base: str | None, ours: str | None, theirs: str | None
 ) -> tuple[str | None, bool]:
@@ -67,6 +71,7 @@ def _resolve(
     return (ours if ours is not None else theirs), True
 
 
+# lit:chunk id=three_way_merge src=lit/merge.md
 def three_way_merge(
     base: Document,
     ours: Document,
@@ -103,6 +108,7 @@ def three_way_merge(
     return MergeResult(document=document, conflicts=conflicts)
 
 
+# lit:chunk id=_slots src=lit/merge.md
 def _slots(doc: Document) -> dict[str | None, str]:
     """Prose text keyed by the id of the following chunk (None = trailing)."""
     slots: dict[str | None, str] = {}
@@ -119,6 +125,7 @@ def _slots(doc: Document) -> dict[str | None, str]:
     return slots
 
 
+# lit:chunk id=_layout src=lit/merge.md
 def _layout(
     ours: Document,
     theirs: Document,
@@ -184,6 +191,7 @@ def _layout(
     return Document(nodes=nodes)
 
 
+# lit:chunk id=_nl src=lit/merge.md
 def _nl(text: str | None) -> str:
     text = text or ""
     return text if not text or text.endswith("\n") else text + "\n"

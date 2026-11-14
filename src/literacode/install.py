@@ -1,3 +1,4 @@
+# lit:chunk id=install-header src=lit/install.md
 """
 literacode install — register the git merge driver.
 
@@ -13,6 +14,7 @@ from pathlib import Path
 GITATTRIBUTES_LINE = "*.md merge=literacode\n"
 
 
+# lit:chunk id=install src=lit/install.md
 def install(repo_root: Path) -> int:
     """
     Register the literacode merge driver for this git repository.
@@ -39,6 +41,7 @@ def install(repo_root: Path) -> int:
     return 0
 
 
+# lit:chunk id=_write_gitattributes src=lit/install.md
 def _write_gitattributes(root: Path) -> None:
     ga = root / ".gitattributes"
     if not ga.exists():
@@ -50,6 +53,7 @@ def _write_gitattributes(root: Path) -> None:
     ga.write_text(existing.rstrip("\n") + "\n" + GITATTRIBUTES_LINE, encoding="utf-8")
 
 
+# lit:chunk id=_driver_command src=lit/install.md
 def _driver_command() -> str:
     """
     The command git runs for a merge.
@@ -62,6 +66,7 @@ def _driver_command() -> str:
     return f"{python} -m literacode.cli merge %O %A %B %P"
 
 
+# lit:chunk id=_register_driver src=lit/install.md
 def _register_driver(root: Path) -> None:
     subprocess.run(
         [

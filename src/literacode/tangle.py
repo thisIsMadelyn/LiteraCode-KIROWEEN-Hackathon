@@ -1,3 +1,4 @@
+# lit:chunk id=tangle-header src=lit/tangle.md
 """
 literacode tangle — model → .py files on disk.
 
@@ -19,13 +20,15 @@ SYNC_MARKER = "# lit:chunk id={id} src={src}"
 REF_RE = re.compile(r"<<([\w-]+)>>")
 
 
+# lit:chunk id=TangleError src=lit/tangle.md
 class TangleError(Exception):
     """Raised for unresolvable errors during tangling."""
 
 
+# lit:chunk id=_expand_refs src=lit/tangle.md
 def _expand_refs(chunk: Chunk, doc: Document, seen: frozenset[str]) -> str:
     """
-    Expand <<other-id>> references in chunk.body recursively.
+    Expand chunk references in chunk.body recursively.
     Returns the fully-expanded body.
     """
     if chunk.id in seen:
@@ -44,9 +47,10 @@ def _expand_refs(chunk: Chunk, doc: Document, seen: frozenset[str]) -> str:
     return REF_RE.sub(replace, chunk.body)
 
 
-def tangle(doc: Document, doc_path: Path, out_root: Path) -> list[Path]:
+# lit:chunk id=render src=lit/tangle.md
+def render(doc: Document, doc_path: Path, out_root: Path) -> dict[Path, str]:
     """
-    Write tangled .py files.
+    The tangled text of every file the document targets, without writing.
 
     Args:
         doc:      The parsed Document.
@@ -55,7 +59,7 @@ def tangle(doc: Document, doc_path: Path, out_root: Path) -> list[Path]:
                   relative to out_root.
 
     Returns:
-        List of Path objects written (one per unique file= target).
+        {output path: file text}, one entry per unique file= target.
     """
     # Group chunks by target file, preserving document order
     file_chunks: dict[str, list[Chunk]] = {}
@@ -66,11 +70,10 @@ def tangle(doc: Document, doc_path: Path, out_root: Path) -> list[Path]:
             file_chunks[chunk.file] = []
         file_chunks[chunk.file].append(chunk)
 
-    written: list[Path] = []
+    rendered: dict[Path, str] = {}
 
     for file_rel, chunks in file_chunks.items():
         out_path = out_root / file_rel
-        out_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Normalise doc_path to be relative to out_root if possible,
         # otherwise use as-is (relative paths look better in markers)
@@ -91,7 +94,30 @@ def tangle(doc: Document, doc_path: Path, out_root: Path) -> list[Path]:
             if i < len(chunks) - 1:
                 lines.append("")  # blank separator between regions
 
-        out_path.write_text("\n".join(lines), encoding="utf-8", newline="")
-        written.append(out_path)
+        rendered[out_path] = "\n".join(lines)
 
-    return written
+    return rendered
+
+
+# lit:chunk id=tangle src=lit/tangle.md
+def tangle(doc: Document, doc_path: Path, out_root: Path) -> list[Path]:
+    """Write tangled .py files.  Returns the paths written."""
+    rendered = render(doc, doc_path, out_root)
+    for out_path, text in rendered.items():
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(text, encoding="utf-8", newline="")
+    return list(rendered)
+
+
+# lit:chunk id=stale src=lit/tangle.md
+def stale(doc: Document, doc_path: Path, out_root: Path) -> list[Path]:
+    """Targets whose file on disk differs from (or is missing from) the tangle."""
+    out = []
+    for out_path, text in render(doc, doc_path, out_root).items():
+        on_disk = (
+            out_path.read_text(encoding="utf-8", newline="")
+            if out_path.is_file() else None
+        )
+        if on_disk != text:
+            out.append(out_path)
+    return out

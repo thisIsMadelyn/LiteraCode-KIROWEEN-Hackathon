@@ -1,3 +1,4 @@
+# lit:chunk id=stitch-header src=lit/stitch.md
 """
 literacode stitch — edited .py files → chunk bodies in the document.
 
@@ -19,10 +20,12 @@ from .serialiser import serialise
 MARKER_RE = re.compile(r"^# lit:chunk id=([\w-]+) src=(.+)$")
 
 
+# lit:chunk id=StitchError src=lit/stitch.md
 class StitchError(Exception):
     """Raised when stitch cannot safely complete."""
 
 
+# lit:chunk id=_split_regions src=lit/stitch.md
 def _split_regions(text: str) -> list[tuple[str, str, str]]:
     """
     Split a tangled .py file into regions at sync marker lines.
@@ -50,6 +53,7 @@ def _split_regions(text: str) -> list[tuple[str, str, str]]:
     return regions
 
 
+# lit:chunk id=stitch src=lit/stitch.md
 def stitch(py_path: Path, doc_path: Path) -> None:
     """
     Read edited chunk bodies from py_path, update doc_path in place.

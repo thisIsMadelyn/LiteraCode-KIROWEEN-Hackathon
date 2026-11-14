@@ -1,3 +1,4 @@
+# lit:chunk id=propose-header src=lit/resolve.md
 """
 Conflict-resolver agent call for ``lit resolve``.
 
@@ -25,6 +26,7 @@ DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-4-5"
 TIMEOUT_S = 90
 
 
+# lit:chunk id=load_system_prompt src=lit/resolve.md
 def load_system_prompt(path: Path = AGENT_PROMPT_PATH) -> str:
     """The text under '## System prompt' in the agent definition."""
     text = path.read_text(encoding="utf-8")
@@ -34,6 +36,7 @@ def load_system_prompt(path: Path = AGENT_PROMPT_PATH) -> str:
     return m.group(1).strip()
 
 
+# lit:chunk id=build_user_message src=lit/resolve.md
 def build_user_message(conflict: dict) -> str:
     """The conflict as JSON: id, lang, and base/ours/theirs with prose context."""
     return json.dumps(
@@ -42,6 +45,7 @@ def build_user_message(conflict: dict) -> str:
     )
 
 
+# lit:chunk id=parse_reply src=lit/resolve.md
 def parse_reply(text: str) -> dict:
     """
     Split the agent's reply into proposal / reasoning / confidence.
@@ -72,6 +76,7 @@ def parse_reply(text: str) -> dict:
     }
 
 
+# lit:chunk id=_post_json src=lit/resolve.md
 def _post_json(url: str, headers: dict, payload: dict) -> dict:
     req = urllib.request.Request(
         url,
@@ -83,6 +88,7 @@ def _post_json(url: str, headers: dict, payload: dict) -> dict:
         return json.load(r)
 
 
+# lit:chunk id=_call_openai src=lit/resolve.md
 def _call_openai(system: str, user: str, key: str) -> str:
     out = _post_json(
         "https://api.openai.com/v1/chat/completions",
@@ -98,6 +104,7 @@ def _call_openai(system: str, user: str, key: str) -> str:
     return out["choices"][0]["message"]["content"]
 
 
+# lit:chunk id=_call_anthropic src=lit/resolve.md
 def _call_anthropic(system: str, user: str, key: str) -> str:
     out = _post_json(
         "https://api.anthropic.com/v1/messages",
@@ -112,6 +119,7 @@ def _call_anthropic(system: str, user: str, key: str) -> str:
     return "".join(b.get("text", "") for b in out["content"])
 
 
+# lit:chunk id=propose_stub src=lit/resolve.md
 def propose_stub(conflict: dict, note: str) -> dict:
     """Offline fallback: propose the ours body unchanged."""
     return {
@@ -122,6 +130,7 @@ def propose_stub(conflict: dict, note: str) -> dict:
     }
 
 
+# lit:chunk id=propose src=lit/resolve.md
 def propose(conflict: dict) -> dict:
     """
     Ask the agent to resolve one conflict (an entry from load_conflicts()).

@@ -1,3 +1,4 @@
+# lit:chunk id=cli-header src=lit/cli.md
 """
 literacode CLI entry point.
 
@@ -18,29 +19,44 @@ from .driver import merge_driver
 from .install import install
 from .parser import parse_document
 from .stitch import MARKER_RE, StitchError, stitch
-from .tangle import TangleError, tangle
+from .tangle import TangleError, stale, tangle
 
 
+# lit:chunk id=cmd_tangle src=lit/cli.md
 def cmd_tangle(args: argparse.Namespace) -> int:
-    doc_path = Path(args.file)
-    if not doc_path.exists():
-        print(f"lit tangle: file not found: {doc_path}", file=sys.stderr)
-        return 1
-
     out_root = Path(args.out) if args.out else Path(".")
+    rc = 0
+    found_target = False
 
-    try:
-        written = tangle(parse_document(doc_path), doc_path, out_root)
-    except TangleError as e:
-        print(f"lit tangle: {e}", file=sys.stderr)
-        return 1
+    for file in args.files:
+        doc_path = Path(file)
+        if not doc_path.exists():
+            print(f"lit tangle: file not found: {doc_path}", file=sys.stderr)
+            rc = 1
+            continue
 
-    if not written:
+        try:
+            doc = parse_document(doc_path)
+            if args.check:
+                paths = stale(doc, doc_path, out_root)
+            else:
+                paths = tangle(doc, doc_path, out_root)
+        except TangleError as e:
+            print(f"lit tangle: {e}", file=sys.stderr)
+            rc = 1
+            continue
+
+        found_target = found_target or any(c.file for c in doc.chunks())
+        for p in paths:
+            if args.check:
+                print(f"  stale {p}  (differs from {doc_path})", file=sys.stderr)
+                rc = 1
+            else:
+                print(f"  wrote {p}")
+
+    if not found_target and rc == 0:
         print("lit tangle: no tangle targets found (no chunk has file= attribute)")
-    for p in written:
-        print(f"  wrote {p}")
-    return 0
-
+    return rc
 
 def _doc_path_from_markers(py_path: Path) -> Path | None:
     """The source document named by the first sync marker in py_path, if any."""
@@ -51,6 +67,7 @@ def _doc_path_from_markers(py_path: Path) -> Path | None:
     return None
 
 
+# lit:chunk id=cmd_stitch src=lit/cli.md
 def cmd_stitch(args: argparse.Namespace) -> int:
     rc = 0
     for py_file in args.files:
@@ -85,10 +102,12 @@ def cmd_stitch(args: argparse.Namespace) -> int:
     return rc
 
 
+# lit:chunk id=cmd_install src=lit/cli.md
 def cmd_install(args: argparse.Namespace) -> int:
     return install(Path("."))
 
 
+# lit:chunk id=cmd_merge src=lit/cli.md
 def cmd_merge(args: argparse.Namespace) -> int:
     # git calls: lit merge %O %A %B %P
     # %O = base, %A = ours (write result here), %B = theirs, %P = path hint
@@ -100,12 +119,14 @@ def cmd_merge(args: argparse.Namespace) -> int:
     )
 
 
+# lit:chunk id=cmd_resolve src=lit/cli.md
 def cmd_resolve(args: argparse.Namespace) -> int:
     # Phase 3: the module does not exist yet, so import lazily.
     from .resolve import serve
     return serve(args.file, port=args.port)
 
 
+# lit:chunk id=main src=lit/cli.md
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="lit",
@@ -114,7 +135,11 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_tangle = sub.add_parser("tangle", help="document -> .py files")
-    p_tangle.add_argument("file", help="path to the .md document")
+    p_tangle.add_argument("files", nargs="+", help="path(s) to the .md document(s)")
+    p_tangle.add_argument(
+        "--check", action="store_true",
+        help="write nothing; exit 1 if any generated file differs from disk",
+    )
     p_tangle.add_argument(
         "--out", default=None, metavar="DIR",
         help="output root directory (default: current directory)"
@@ -144,5 +169,6 @@ def main() -> None:
     sys.exit(args.func(args))
 
 
+# lit:chunk id=main-guard src=lit/cli.md
 if __name__ == "__main__":
     main()

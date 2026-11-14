@@ -1,3 +1,4 @@
+# lit:chunk id=driver-header src=lit/merge.md
 """
 literacode merge driver — called by git as: lit merge %O %A %B %P
 
@@ -15,6 +16,7 @@ from .parser import parse_document
 from .serialiser import serialise
 
 
+# lit:chunk id=_CONFLICT_ATTR src=lit/merge.md
 # ---------------------------------------------------------------------------
 # Conflict marker format (for lit resolve to find later)
 # ---------------------------------------------------------------------------
@@ -22,6 +24,7 @@ from .serialiser import serialise
 _CONFLICT_ATTR = " lit:conflict"
 
 
+# lit:chunk id=_embed_conflict_markers src=lit/merge.md
 def _embed_conflict_markers(result: MergeResult) -> None:
     """
     In-place: replace conflicted Chunk bodies in result.document with a
@@ -56,6 +59,7 @@ def _embed_conflict_markers(result: MergeResult) -> None:
             node._fence_attrs = node._fence_attrs + _CONFLICT_ATTR
 
 
+# lit:chunk id=merge_driver src=lit/merge.md
 def merge_driver(
     base: Path,
     ours: Path,

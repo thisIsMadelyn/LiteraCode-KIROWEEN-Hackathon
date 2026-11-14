@@ -1,1 +1,4 @@
 *.md merge=literacode
+lit/*.md text eol=lf
+src/literacode/*.py text eol=lf
+.githooks/* text eol=lf
