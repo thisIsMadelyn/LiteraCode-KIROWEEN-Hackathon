@@ -65,6 +65,8 @@ past this. ✅ Gate passed — all 22 tests green.
 
 **Gate:** Scenario B works end to end.
 
+**Gate status: PENDING manual sign-off (owner: user).** API path verified on real git; still to do by hand: build the UI (`npm.cmd run build` in `ui/`), run `lit resolve` on a real conflicted merge, click Get proposal / Accept / Edit / Reject / Resolve, and try once with an API key set. Tick this gate only after that pass.
+
 ### Phase 4 — self-hosting and polish (24–29 Nov)
 - [ ] migrate `src/` to literate sources under `lit/`
 - [ ] README with the thesis and a 60-second quickstart
