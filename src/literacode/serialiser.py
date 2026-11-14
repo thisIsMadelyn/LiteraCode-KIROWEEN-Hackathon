@@ -2,7 +2,7 @@
 """
 literacode serialiser — model → markdown.
 
-Rules (from format-grammar.md §6):
+Rules (from the round-trip invariant above):
 - Prose nodes are written verbatim.  Every byte is preserved.
 - Chunk nodes are reconstructed from their model fields: opening fence line,
   body, closing fence.  The _fence_attrs field reproduces the original
