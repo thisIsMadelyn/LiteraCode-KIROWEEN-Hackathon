@@ -39,8 +39,9 @@ badges of either kind. Changes that are neither get a plain bullet.
   - 🐛 Bug fix — theirs-side prose edits were dropped by the merge; prose now merges per slot (the prose before each chunk), and edits on both sides conflict with git-style markers (`00d9089`)
   - 🆕 Addition — `src/literacode/resolve.py`: `lit resolve [file] [--port N]` serves `ui/dist` and `/api/conflicts` with base/ours/theirs bodies and surrounding prose, read from git index stages 1-3 (`9516c6b`)
   - 🆕 Addition — `tests/test_resolve.py` and three prose-merge tests (`9516c6b`)
+  - 🆕 Addition — `ui/`: Vite + React app with base/ours/theirs columns, prose context, changed-line highlighting, editable resolution area, prev/next and jump navigation; checked in a headless browser at 1280px
 
-**Open:** React app (`ui/`) does not exist; the server shows a placeholder page. `/api/resolve` and `/api/propose` not written. Prose conflicts are not shown in `lit resolve`; they must be fixed by hand. `npm` is blocked by PowerShell execution policy (use `npm.cmd`). `ruff` not run.
+**Open:** The React app (`ui/`) has the three-column view only: no Resolve button. `ui/dist` is gitignored (`dist/`), so it must be built with `npm run build` in `ui/`. `/api/resolve` and `/api/propose` not written. Prose conflicts are not shown in `lit resolve`; they must be fixed by hand. `npm` is blocked by PowerShell execution policy (use `npm.cmd`). `ruff` not run.
 
 ## Session [2026-11-10-1406]
 
