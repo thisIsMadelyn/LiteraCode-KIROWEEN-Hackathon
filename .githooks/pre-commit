@@ -5,8 +5,7 @@
 #
 # Two jobs:
 #   1. refuse to commit on main/master
-#   2. refuse to commit when the literate document and the tangled sources
-#      have drifted apart
+#   2. refuse to commit when src/ no longer matches what lit/ tangles to
 
 set -euo pipefail
 
@@ -17,24 +16,23 @@ if [[ "$branch" == "main" || "$branch" == "master" ]]; then
   exit 1
 fi
 
-# Bootstrap phase: no lit/ yet, or lit not installed.
-if [[ ! -d lit ]] || ! command -v lit >/dev/null 2>&1; then
-  exit 0
-fi
-
-tmp="$(mktemp -d)"
-trap 'rm -rf "$tmp"' EXIT
-cp -r lit "$tmp/lit-before"
-
-if ! lit stitch >/dev/null 2>&1; then
-  echo "pre-commit: 'lit stitch' failed. The document and src/ are out of sync." >&2
+# Use the installed `lit`, else any interpreter that can import the package.
+if command -v lit >/dev/null 2>&1; then
+  LIT=(lit)
+elif python3 -c "import literacode" >/dev/null 2>&1; then
+  LIT=(python3 -m literacode.cli)
+elif python -c "import literacode" >/dev/null 2>&1; then
+  LIT=(python -m literacode.cli)
+else
+  echo "pre-commit: cannot run lit (no 'lit' on PATH, package not importable)." >&2
   exit 1
 fi
-
-if ! diff -rq "$tmp/lit-before" lit >/dev/null 2>&1; then
-  echo "pre-commit: 'lit stitch' changed the document." >&2
-  echo "            src/ held edits that were not in lit/. They are now stitched in." >&2
-  echo "            review the diff, stage lit/, and commit again." >&2
+# src/ is generated from lit/. Block the commit if any generated file differs
+# from what tangling lit/*.md would write.
+if ! "${LIT[@]}" tangle --check lit/*.md; then
+  echo "pre-commit: src/ is out of sync with lit/." >&2
+  echo "            edited a document?  run: lit tangle lit/*.md" >&2
+  echo "            edited a .py file?  run: lit stitch <file.py>, then lit tangle lit/*.md" >&2
   exit 1
 fi
 

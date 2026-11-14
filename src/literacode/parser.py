@@ -1,3 +1,4 @@
+# lit:chunk id=parser-header src=lit/format.md
 """
 literacode parser — document → model.
 
@@ -12,19 +13,21 @@ from pathlib import Path
 
 from .model import Chunk, Document, Prose
 
-# Opening fence: ```<lang>[attrs]
-# Group 1 = lang, Group 2 = rest of attribute string (may be empty)
-FENCE_OPEN_RE = re.compile(r"^(```+)(\w+)([ \t].*)?\s*$")
+# Opening fence: ```[lang][attrs]  (the language may be absent)
+# Group 1 = fence marker, 2 = lang, 3 = rest of attribute string (may be empty)
+FENCE_OPEN_RE = re.compile(r"^(```+)(\w*)([ \t].*)?\s*$")
 
 # Key=value tokens in the attribute string
 ATTR_RE = re.compile(r"([\w-]+)=(\S+)")
 
 
+# lit:chunk id=_parse_attrs src=lit/format.md
 def _parse_attrs(attr_str: str) -> dict[str, str]:
     """Return {key: value} from a space-separated key=value string."""
     return {m.group(1): m.group(2) for m in ATTR_RE.finditer(attr_str)}
 
 
+# lit:chunk id=parse_document src=lit/format.md
 def parse_document(path: Path) -> Document:
     """
     Parse a literacode markdown file and return a Document.
@@ -36,6 +39,7 @@ def parse_document(path: Path) -> Document:
     return parse_string(text)
 
 
+# lit:chunk id=parse_string src=lit/format.md
 def parse_string(text: str) -> Document:
     """Parse a literacode document from a string."""
     lines = text.splitlines(keepends=True)
@@ -44,6 +48,7 @@ def parse_string(text: str) -> Document:
     prose_lines: list[str] = []
     chunk_lines: list[str] = []
     in_chunk = False
+    plain_fence_marker = ""             # set while inside a fence with no id=
     current_fence_marker: str = ""      # the backtick prefix (``` or ````)
     current_fence_attrs: str = ""       # the raw attribute string after lang
     current_lang: str = ""
@@ -69,7 +74,13 @@ def parse_string(text: str) -> Document:
         chunk_lines.clear()
 
     for line in lines:
-        if not in_chunk:
+        if plain_fence_marker:
+            # Inside a plain fence: everything up to its closing fence is
+            # prose, even lines that look like chunk fences (CommonMark rule).
+            prose_lines.append(line)
+            if line.rstrip("\n\r") == plain_fence_marker:
+                plain_fence_marker = ""
+        elif not in_chunk:
             # Check for an opening fence
             m = FENCE_OPEN_RE.match(line)
             if m:
@@ -92,6 +103,7 @@ def parse_string(text: str) -> Document:
                     continue
                 # Plain fence without id= → prose
                 prose_lines.append(line)
+                plain_fence_marker = fence_marker
             else:
                 prose_lines.append(line)
         else:

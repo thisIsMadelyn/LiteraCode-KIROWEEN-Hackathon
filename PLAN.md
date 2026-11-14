@@ -68,10 +68,10 @@ past this. ✅ Gate passed — all 22 tests green.
 **Gate status: PENDING manual sign-off (owner: user).** API path verified on real git; still to do by hand: build the UI (`npm.cmd run build` in `ui/`), run `lit resolve` on a real conflicted merge, click Get proposal / Accept / Edit / Reject / Resolve, and try once with an API key set. Tick this gate only after that pass.
 
 ### Phase 4 — self-hosting and polish (24–29 Nov)
-- [ ] migrate `src/` to literate sources under `lit/`
+- [x] migrate `src/` to literate sources under `lit/`
 - [ ] README with the thesis and a 60-second quickstart
 - [ ] the format spec written in the format, tangling to the parser
-- [ ] pre-commit hook shipped
+- [x] pre-commit hook shipped
 
 ### Phase 5 — submission (30 Nov – 3 Dec)
 - [ ] 3-minute video
@@ -119,3 +119,4 @@ Append only. One line per session: date, SHA, what moved, what is blocked.
 2026-11-14 · 4800d3f · React UI (ui/, Vite) with three-column view, line highlighting, prev/next and jump nav; screenshot-checked at 1280px · open: agent, resolve button and /api/resolve · next: tasks 3-3, 3-4
 2026-11-14 · be4b41e · /api/propose + agent call (OpenAI/Anthropic/stub) + proposal diff with Accept/Edit/Reject in UI · open: not exercised against a live provider, Resolve button and /api/resolve · next: task 3-4
 2026-11-14 · 738af7b · /api/resolve + Resolve button + all-done screen; Scenario B driven through the HTTP API on a real git merge (conflict, propose, resolve, git add, commit) · open: Phase 3 gate not signed off, UI buttons never clicked in a browser, agent never run against a live provider · next: manual browser pass, then Phase 4
+2026-11-14 · branch self-host · src/ migrated to lit/*.md (7 documents, 12 files, 69 chunks); lit tangle takes several documents and --check; parser now treats a plain fence body as prose; pre-commit hook blocks stale src/ (tested with Git bash) · open: self-host not merged to main, no escape for a literal chunk reference in code · bootstrap exception is over: edit lit/, not src/

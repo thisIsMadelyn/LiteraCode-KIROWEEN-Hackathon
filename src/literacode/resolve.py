@@ -1,3 +1,4 @@
+# lit:chunk id=resolve-header src=lit/resolve.md
 """
 literacode resolve - local conflict server.
 
@@ -40,6 +41,7 @@ _PLACEHOLDER = (
 )
 
 
+# lit:chunk id=ResolveError src=lit/resolve.md
 class ResolveError(Exception):
     def __init__(self, message: str, status: int = 400):
         super().__init__(message)
@@ -49,6 +51,7 @@ def is_conflicted(chunk: Chunk) -> bool:
     return CONFLICT_ATTR in chunk._fence_attrs.split()
 
 
+# lit:chunk id=_split_markers src=lit/resolve.md
 def _split_markers(body: str) -> tuple[str, str]:
     """(ours, theirs) from a body written by the merge driver."""
     ours: list[str] = []
@@ -66,6 +69,7 @@ def _split_markers(body: str) -> tuple[str, str]:
     return "".join(ours), "".join(theirs)
 
 
+# lit:chunk id=_git_stage src=lit/resolve.md
 def _git_stage(stage: int, path: Path) -> str | None:
     """Contents of the file at an index stage, or None if there is none."""
     try:
@@ -84,6 +88,7 @@ def _git_stage(stage: int, path: Path) -> str | None:
     return out.stdout.decode("utf-8")
 
 
+# lit:chunk id=_context src=lit/resolve.md
 def _context(doc: Document | None, chunk_id: str) -> dict[str, str] | None:
     """Body plus nearest prose before/after for one chunk, or None if absent."""
     if doc is None:
@@ -101,9 +106,11 @@ def _context(doc: Document | None, chunk_id: str) -> dict[str, str] | None:
     return None
 
 
+# lit:chunk id=_EMPTY src=lit/resolve.md
 _EMPTY = {"body": "", "prose_before": "", "prose_after": ""}
 
 
+# lit:chunk id=load_conflicts src=lit/resolve.md
 def load_conflicts(doc_path: Path) -> list[dict]:
     """The conflicts in doc_path, as the payload ``/api/conflicts`` returns."""
     work = parse_string(doc_path.read_text(encoding="utf-8"))
@@ -136,13 +143,16 @@ def load_conflicts(doc_path: Path) -> list[dict]:
     return result
 
 
+# lit:chunk id=_MARKER_LINE src=lit/resolve.md
 _MARKER_LINE = re.compile(r"^(<<<<<<< |=======$|>>>>>>> )", re.M)
 
 
+# lit:chunk id=file_hash src=lit/resolve.md
 def file_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+# lit:chunk id=resolve_chunk src=lit/resolve.md
 def resolve_chunk(doc_path: Path, chunk_id: str, body: str, expected_hash: str) -> dict:
     """
     Write ``body`` as the resolution of one conflicted chunk.
@@ -190,6 +200,7 @@ def resolve_chunk(doc_path: Path, chunk_id: str, body: str, expected_hash: str) 
     }
 
 
+# lit:chunk id=_make_handler src=lit/resolve.md
 def _make_handler(doc_path: Path, static_root: Path, state: dict):
     class Handler(http.server.BaseHTTPRequestHandler):
         def log_message(self, fmt, *args):  # keep the terminal quiet
@@ -284,6 +295,7 @@ def _make_handler(doc_path: Path, static_root: Path, state: dict):
     return Handler
 
 
+# lit:chunk id=make_server src=lit/resolve.md
 def make_server(doc_path: Path, port: int, static_root: Path | None = None):
     if static_root is None:
         static_root = Path(__file__).resolve().parents[2] / "ui" / "dist"
@@ -293,6 +305,7 @@ def make_server(doc_path: Path, port: int, static_root: Path | None = None):
     )
 
 
+# lit:chunk id=find_conflicted_doc src=lit/resolve.md
 def find_conflicted_doc() -> Path | None:
     """The single unmerged .md file in the repo, if exactly one."""
     try:
@@ -306,6 +319,7 @@ def find_conflicted_doc() -> Path | None:
     return Path(md[0]) if len(md) == 1 else None
 
 
+# lit:chunk id=serve src=lit/resolve.md
 def serve(file: str | None = None, port: int = 7777) -> int:
     doc_path = Path(file) if file else find_conflicted_doc()
     if doc_path is None:

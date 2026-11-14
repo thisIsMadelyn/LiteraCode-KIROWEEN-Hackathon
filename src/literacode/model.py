@@ -1,3 +1,4 @@
+# lit:chunk id=model-header src=lit/format.md
 """
 literacode document model.
 
@@ -9,12 +10,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 
+# lit:chunk id=Prose src=lit/format.md
 @dataclass
 class Prose:
     """Raw markdown text between (or before/after) chunk fences."""
     text: str  # verbatim, every byte preserved
 
 
+# lit:chunk id=Chunk src=lit/format.md
 @dataclass
 class Chunk:
     """A named fenced code block — the unit of identity in literacode."""
@@ -29,6 +32,7 @@ class Chunk:
     _fence_attrs: str = field(default="", repr=False, compare=False)
 
 
+# lit:chunk id=Document src=lit/format.md
 @dataclass
 class Document:
     """The parsed representation of a literacode markdown file."""

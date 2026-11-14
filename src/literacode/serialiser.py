@@ -1,3 +1,4 @@
+# lit:chunk id=serialiser-header src=lit/format.md
 """
 literacode serialiser — model → markdown.
 
@@ -14,6 +15,7 @@ from __future__ import annotations
 from .model import Chunk, Document, Prose
 
 
+# lit:chunk id=serialise src=lit/format.md
 def serialise(doc: Document) -> str:
     """Return the markdown text for a Document."""
     parts: list[str] = []
