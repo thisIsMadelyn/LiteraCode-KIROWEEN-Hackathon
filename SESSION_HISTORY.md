@@ -30,8 +30,6 @@ badges of either kind. Changes that are neither get a plain bullet.
 - No keys, no paths that are not already public in the repo, no internal-only
   detail.
 
----
-
 ## Session [2026-11-14-1200]
 
 - **Start status:** branch `simplify-core` at `39d89b1`, 37/37 tests green, not merged to `main`
@@ -39,8 +37,8 @@ badges of either kind. Changes that are neither get a plain bullet.
 - **Badges:**
   - simplify-core merged to `main` (merge commit)
   - 🐛 Bug fix — theirs-side prose edits were dropped by the merge; prose now merges per slot (the prose before each chunk), and edits on both sides conflict with git-style markers (`00d9089`)
-  - 🆕 Addition — `src/literacode/resolve.py`: `lit resolve [file] [--port N]` serves `ui/dist` and `/api/conflicts` with base/ours/theirs bodies and surrounding prose, read from git index stages 1-3 (`00d9089`)
-  - 🆕 Addition — `tests/test_resolve.py` and three prose-merge tests
+  - 🆕 Addition — `src/literacode/resolve.py`: `lit resolve [file] [--port N]` serves `ui/dist` and `/api/conflicts` with base/ours/theirs bodies and surrounding prose, read from git index stages 1-3 (`9516c6b`)
+  - 🆕 Addition — `tests/test_resolve.py` and three prose-merge tests (`9516c6b`)
 
 **Open:** React app (`ui/`) does not exist; the server shows a placeholder page. `/api/resolve` and `/api/propose` not written. Prose conflicts are not shown in `lit resolve`; they must be fixed by hand. `npm` is blocked by PowerShell execution policy (use `npm.cmd`). `ruff` not run.
 
