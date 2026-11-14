@@ -69,7 +69,7 @@ past this. ✅ Gate passed — all 22 tests green.
 
 ### Phase 4 — self-hosting and polish (24–29 Nov)
 - [x] migrate `src/` to literate sources under `lit/`
-- [ ] README with the thesis and a 60-second quickstart
+- [x] README with the thesis and a 60-second quickstart
 - [ ] the format spec written in the format, tangling to the parser
 - [x] pre-commit hook shipped
 
@@ -120,3 +120,4 @@ Append only. One line per session: date, SHA, what moved, what is blocked.
 2026-11-14 · be4b41e · /api/propose + agent call (OpenAI/Anthropic/stub) + proposal diff with Accept/Edit/Reject in UI · open: not exercised against a live provider, Resolve button and /api/resolve · next: task 3-4
 2026-11-14 · 738af7b · /api/resolve + Resolve button + all-done screen; Scenario B driven through the HTTP API on a real git merge (conflict, propose, resolve, git add, commit) · open: Phase 3 gate not signed off, UI buttons never clicked in a browser, agent never run against a live provider · next: manual browser pass, then Phase 4
 2026-11-14 · branch self-host · src/ migrated to lit/*.md (7 documents, 12 files, 69 chunks); lit tangle takes several documents and --check; parser now treats a plain fence body as prose; pre-commit hook blocks stale src/ (tested with Git bash) · open: self-host not merged to main, no escape for a literal chunk reference in code · bootstrap exception is over: edit lit/, not src/
+2026-11-14 · branch readme · README.md written (thesis, quickstart, commands, limits); tangle/stitch steps of the quickstart run in a scratch repo · open: quickstart's merge and resolve steps not re-run from a fresh install, self-host merged to main
