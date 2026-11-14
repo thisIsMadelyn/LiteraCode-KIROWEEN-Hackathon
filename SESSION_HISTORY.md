@@ -50,6 +50,8 @@ badges of either kind. Changes that are neither get a plain bullet.
   - 🐛 Bug fix — tangling `tangle.py` failed because its docstring contained a literal chunk reference, which tangle tried to expand. The docstring was reworded. There is still no escape syntax for a literal reference in code.
   - `.gitattributes` pins LF for `lit/*.md`, `src/literacode/*.py` and `.githooks/*`. The bootstrap exception of the literate-first rule is over.
 
+- The format specification (grammar sections 1-6) now lives in `lit/format.md` beside the model, parser and serialiser chunks; `lit/format-grammar.md` is a pointer. The spec's model section no longer lists `Chunk.refs`, which was removed earlier. README and two docstrings updated to match.
+
 **Open:** The React app (`ui/`) has the three-column view only: no Resolve button. `ui/dist` is gitignored (`dist/`), so it must be built with `npm run build` in `ui/`. The Phase 3 gate is not signed off: the UI buttons (Resolve, Accept, Edit, Reject) were never clicked in a browser. No `.lit_resolved` backup of the original is kept; the original stays recoverable from git index stages. The agent call has not been run against a live provider, and the Accept/Edit/Reject buttons were not clicked in a browser (diff logic and endpoint tested only). Prose conflicts are not shown in `lit resolve`; they must be fixed by hand. `npm` is blocked by PowerShell execution policy (use `npm.cmd`). `ruff` not run.
 
 ## Session [2026-11-10-1406]
