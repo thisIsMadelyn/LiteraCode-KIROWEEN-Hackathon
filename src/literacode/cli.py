@@ -6,7 +6,7 @@ Commands:
     lit stitch <file.py> ...      — edited .py files → chunks in document
     lit install                   — register git merge driver
     lit merge %O %A %B %P         — the merge driver (called by git)
-    lit resolve                   — serve the conflict resolution UI
+    lit resolve [file.md] [--port N]  — serve the conflict resolution UI
 """
 from __future__ import annotations
 
@@ -103,7 +103,7 @@ def cmd_merge(args: argparse.Namespace) -> int:
 def cmd_resolve(args: argparse.Namespace) -> int:
     # Phase 3: the module does not exist yet, so import lazily.
     from .resolve import serve
-    return serve(port=args.port)
+    return serve(args.file, port=args.port)
 
 
 def main() -> None:
@@ -136,6 +136,7 @@ def main() -> None:
     p_merge.set_defaults(func=cmd_merge)
 
     p_resolve = sub.add_parser("resolve", help="serve conflict resolution UI")
+    p_resolve.add_argument("file", nargs="?", help="conflicted .md file (default: the one unmerged file)")
     p_resolve.add_argument("--port", type=int, default=7777)
     p_resolve.set_defaults(func=cmd_resolve)
 

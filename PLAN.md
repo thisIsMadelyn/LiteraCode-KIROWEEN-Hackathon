@@ -113,3 +113,4 @@ Append only. One line per session: date, SHA, what moved, what is blocked.
 2026-11-01 · ca63ba0 · Phase 1 complete · parser, tangle, stitch, losslessness gate — 22/22 tests green · Phase 2 (merge driver) next
 2026-11-01 · 9e0946c · Phase 2 complete · merge driver, Scenario A gate on real branches · Phase 3 (resolve UI) next
 2026-11-10 · 960ef25 · simplification pass on branch simplify-core · fixed no-op driver (missing __main__ guard), merge.py and stitch.py slimmed, wrapper script removed · open: theirs-side prose edits dropped by merge, simplify-core not yet merged to main · Phase 3 (resolve UI) next
+2026-11-14 · 00d9089 · simplify-core merged to main; prose now merged per slot (theirs-side prose edits kept, both-sided prose edits conflict); lit resolve server + /api/conflicts done (task 3-1 server half, React app not started) · Phase 3 continues
