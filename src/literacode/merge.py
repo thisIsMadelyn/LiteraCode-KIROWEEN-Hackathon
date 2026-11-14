@@ -31,6 +31,7 @@ class Conflict:
     base_body: str | None       # None if the chunk didn't exist in base
     ours_body: str              # "" if ours deleted the chunk
     theirs_body: str            # "" if theirs deleted the chunk
+    kind: str = "chunk"         # "chunk" or "prose" (then chunk_id is the slot key)
 
 
 @dataclass
@@ -98,10 +99,24 @@ def three_way_merge(
                 theirs_body=theirs_body if theirs_body is not None else "",
             ))
 
-    return MergeResult(
-        document=_layout(ours, theirs, resolved, theirs_map),
-        conflicts=conflicts,
-    )
+    document = _layout(ours, theirs, resolved, theirs_map, base, conflicts)
+    return MergeResult(document=document, conflicts=conflicts)
+
+
+def _slots(doc: Document) -> dict[str | None, str]:
+    """Prose text keyed by the id of the following chunk (None = trailing)."""
+    slots: dict[str | None, str] = {}
+    pending = ""
+    for node in doc.nodes:
+        if isinstance(node, Prose):
+            pending += node.text
+        else:
+            if pending:
+                slots[node.id] = pending
+            pending = ""
+    if pending:
+        slots[None] = pending
+    return slots
 
 
 def _layout(
@@ -109,9 +124,12 @@ def _layout(
     theirs: Document,
     resolved: dict[str, str | None],
     theirs_map: dict[str, Chunk],
+    base: Document,
+    conflicts: list[Conflict],
 ) -> Document:
     """Build the merged Document in ours order, slotting in theirs-only chunks."""
     ours_ids = {c.id for c in ours.chunks()}
+    base_slots, ours_slots, theirs_slots = _slots(base), _slots(ours), _slots(theirs)
 
     # Anchor each theirs-only chunk to the nearest preceding chunk in theirs'
     # order that ours also has (None = before any shared chunk).
@@ -125,22 +143,47 @@ def _layout(
 
     nodes: list[Prose | Chunk] = []
 
+    def emit_slot(key: str | None) -> None:
+        o, t = ours_slots.get(key), theirs_slots.get(key)
+        text, is_conflict = _resolve(base_slots.get(key), o, t)
+        if is_conflict:
+            conflicts.append(Conflict(
+                chunk_id="" if key is None else key,
+                base_body=base_slots.get(key),
+                ours_body=o or "",
+                theirs_body=t or "",
+                kind="prose",
+            ))
+            text = (
+                "<<<<<<< ours\n" + _nl(o) + "=======\n" + _nl(t)
+                + ">>>>>>> theirs\n"
+            )
+        if text:
+            nodes.append(Prose(text=text))
+
     def emit_theirs_only(anchor_id: str | None) -> None:
         for tid in after.get(anchor_id, []):
             body = resolved[tid]
             if body is not None:
+                emit_slot(tid)
                 nodes.append(replace(theirs_map[tid], body=body))
 
     emit_theirs_only(None)
     for node in ours.nodes:
         if isinstance(node, Prose):
-            nodes.append(node)
             continue
         body = resolved[node.id]
         if body is None:
             continue  # deleted
+        emit_slot(node.id)
         # Structural attributes (file, lang, fence) are taken from ours.
         nodes.append(replace(node, body=body))
         emit_theirs_only(node.id)
+    emit_slot(None)
 
     return Document(nodes=nodes)
+
+
+def _nl(text: str | None) -> str:
+    text = text or ""
+    return text if not text or text.endswith("\n") else text + "\n"

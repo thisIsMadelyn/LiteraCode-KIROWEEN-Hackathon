@@ -190,3 +190,42 @@ def test_demo_fixture(tmp_path: Path):
     doc = parse_document(fixture)
     result = three_way_merge(doc, doc, doc)
     assert result.is_clean
+
+
+# ---------------------------------------------------------------------------
+# Prose slots
+# ---------------------------------------------------------------------------
+
+def _pdoc(text: str) -> Document:
+    return parse_string(text)
+
+
+_FENCE = "```python id=a file=a.py\nx = 1\n```\n"
+
+
+def test_theirs_only_prose_edit_is_kept():
+    base = _pdoc("Intro.\n\n" + _FENCE)
+    ours = _pdoc("Intro.\n\n" + _FENCE)
+    theirs = _pdoc("Intro, rewritten.\n\n" + _FENCE)
+    result = three_way_merge(base, ours, theirs)
+    assert result.is_clean
+    assert result.document.nodes[0].text == "Intro, rewritten.\n\n"
+
+
+def test_ours_only_prose_edit_is_kept():
+    base = _pdoc("Intro.\n\n" + _FENCE)
+    ours = _pdoc("Mine.\n\n" + _FENCE)
+    theirs = _pdoc("Intro.\n\n" + _FENCE)
+    result = three_way_merge(base, ours, theirs)
+    assert result.is_clean
+    assert result.document.nodes[0].text == "Mine.\n\n"
+
+
+def test_both_sides_edit_prose_conflicts_with_markers():
+    base = _pdoc("Intro.\n\n" + _FENCE)
+    ours = _pdoc("Mine.\n\n" + _FENCE)
+    theirs = _pdoc("Theirs.\n\n" + _FENCE)
+    result = three_way_merge(base, ours, theirs)
+    assert [(c.kind, c.chunk_id) for c in result.conflicts] == [("prose", "a")]
+    text = result.document.nodes[0].text
+    assert "<<<<<<< ours\nMine.\n" in text and "Theirs." in text

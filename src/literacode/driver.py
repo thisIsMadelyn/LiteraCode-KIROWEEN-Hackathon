@@ -35,7 +35,7 @@ def _embed_conflict_markers(result: MergeResult) -> None:
         <theirs body>
         >>>>>>> theirs
     """
-    conflict_map = {c.chunk_id: c for c in result.conflicts}
+    conflict_map = {c.chunk_id: c for c in result.conflicts if c.kind == "chunk"}
 
     for node in result.document.nodes:
         if not isinstance(node, Chunk):
@@ -88,8 +88,9 @@ def merge_driver(
 
     if result.conflicts:
         for conflict in result.conflicts:
+            what = "chunk" if conflict.kind == "chunk" else "prose before chunk"
             print(
-                f"CONFLICT (literacode): chunk '{conflict.chunk_id}' "
+                f"CONFLICT (literacode): {what} '{conflict.chunk_id}' "
                 f"modified on both sides in {path_hint or str(ours)}",
                 file=sys.stderr,
             )
