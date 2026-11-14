@@ -11,3 +11,11 @@ export interface Conflict {
   ours: Side;
   theirs: Side;
 }
+export interface Proposal {
+  /** null when the agent says it cannot resolve the conflict */
+  proposal: string | null;
+  reasoning: string;
+  confidence: string;
+  /** "openai" | "anthropic" | "stub" */
+  source: string;
+}

@@ -17,4 +17,9 @@ pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.85
 .line.changed { background: #fff8c5; display: block; }
 .resolution { margin-top: 16px; }
 .resolution label { display: block; font-weight: 600; margin-bottom: 4px; }
-textarea { width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.85rem; padding: 8px; }
+textarea { width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.85rem; padding: 8px; }.proposal { margin-top: 16px; }
+.proposal h3 { font-size: 0.9rem; margin: 12px 0 4px; }
+.note { color: #57606a; font-size: 0.85rem; }
+.actions { display: flex; gap: 8px; margin-top: 8px; }
+.line.add { background: #dafbe1; display: block; }
+.line.del { background: #ffebe9; display: block; }

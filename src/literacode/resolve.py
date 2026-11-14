@@ -4,8 +4,9 @@ literacode resolve - local conflict server.
 Serves the built React app from ``ui/dist`` and a small JSON API.  Local only:
 binds to 127.0.0.1, no auth, no deployment.
 
-API (this module, task 3-1):
+API:
     GET|POST /api/conflicts   conflicted chunks with base/ours/theirs context
+    POST /api/propose         {chunk_id} -> agent proposal (read-only; see propose.py)
 
 Base and theirs come from git's index stages (``:1:``, ``:3:``) when the file
 is mid-merge; the working-tree copy supplies ours.  Outside a merge, only the
@@ -152,8 +153,26 @@ def _make_handler(doc_path: Path, static_root: Path):
                 return True
             return False
 
+        def _propose(self) -> None:
+            """POST /api/propose {chunk_id} -> agent proposal. Never writes."""
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+                chunk_id = json.loads(self.rfile.read(length) or b"{}")["chunk_id"]
+                match = [c for c in load_conflicts(doc_path) if c["chunk_id"] == chunk_id]
+            except (OSError, ValueError, KeyError, TypeError) as e:
+                self._json(400, {"error": f"bad request: {e}"})
+                return
+            if not match:
+                self._json(404, {"error": f"no conflict for chunk '{chunk_id}'"})
+                return
+            from .propose import propose
+
+            self._json(200, propose(match[0]))
+
         def do_POST(self):
-            if not self._api():
+            if self.path.split("?")[0] == "/api/propose":
+                self._propose()
+            elif not self._api():
                 self._json(404, {"error": "not found"})
 
         def do_GET(self):
