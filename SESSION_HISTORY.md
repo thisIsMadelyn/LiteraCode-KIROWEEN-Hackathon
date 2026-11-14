@@ -33,7 +33,7 @@ badges of either kind. Changes that are neither get a plain bullet.
 ## Session [2026-11-14-1200]
 
 - **Start status:** branch `simplify-core` at `39d89b1`, 37/37 tests green, not merged to `main`
-- **End status:** `main`, 55/55 tests green, Phase 3 built, gate pending a browser pass
+- **End status:** `main` at `47d019b`, 57/57 tests green, Phases 1 to 4 built, Phase 3 gate pending a browser pass, Phase 5 not started
 - **Badges:**
   - simplify-core merged to `main` (merge commit)
   - 🐛 Bug fix — theirs-side prose edits were dropped by the merge; prose now merges per slot (the prose before each chunk), and edits on both sides conflict with git-style markers (`00d9089`)
@@ -52,21 +52,7 @@ badges of either kind. Changes that are neither get a plain bullet.
 
 - The format specification (grammar sections 1-6) now lives in `lit/format.md` beside the model, parser and serialiser chunks; `lit/format-grammar.md` is a pointer. The spec's model section no longer lists `Chunk.refs`, which was removed earlier. README and two docstrings updated to match.
 
-**Open:** The React app (`ui/`) has the three-column view only: no Resolve button. `ui/dist` is gitignored (`dist/`), so it must be built with `npm run build` in `ui/`. The Phase 3 gate is not signed off: the UI buttons (Resolve, Accept, Edit, Reject) were never clicked in a browser. No `.lit_resolved` backup of the original is kept; the original stays recoverable from git index stages. The agent call has not been run against a live provider, and the Accept/Edit/Reject buttons were not clicked in a browser (diff logic and endpoint tested only). Prose conflicts are not shown in `lit resolve`; they must be fixed by hand. `npm` is blocked by PowerShell execution policy (use `npm.cmd`). `ruff` not run.
-
-## Session [2026-11-10-1406]
-
-- **Start status:** commit `755a26b` on `main`, Phase 2 gate passed, 38/38 tests green, Phase 3 next
-- **End status:** branch `simplify-core` at `960ef25`, 37/37 tests green, Phase 3 not started
-- **Badges:**
-  - 🐛 Bug fix — `python -m literacode.cli` had no `__main__` guard, so the git driver wrapper exited 0 without merging; Scenario A re-verified on real git (plain git conflicts, driver merges clean) (`ccd3054`)
-  - 🐛 Bug fix — `lit stitch` crashed on a non-UTF console printing `→`; printed output is now ASCII (`ccd3054`)
-  - `merge.py` collapsed from 263 to 118 lines: one per-chunk resolve rule, deterministic conflict order; checked against the old implementation on 20,000 random documents with 0 differences (`393ee49`)
-  - `stitch.py` simplified from 113 to 76 lines; fuzzy `src` path check replaced by a basename check (`205c17d`)
-  - Merge driver now registered directly as `<python> -m literacode.cli merge`; `lit_merge_driver.sh` removed (`80727a7`)
-  - Removed unused `Chunk.refs` and `driver.merge_driver_on_docs`; one test removed (`960ef25`)
-
-**Open:** Prose edits made only on the "theirs" side are dropped by the merge (prose is taken from ours). Four-backtick fences, CRLF closing fences and trailing blank lines in a stitched chunk body are not lossless. No `.gitignore`, and `core.autocrlf` behaviour is undecided. `ruff` was not run (not installed). `simplify-core` is not merged to `main`. Phase 3 (`lit resolve`) is next.
+**Open:** (1) The Phase 3 gate is pending a manual browser pass: build the UI with `npm.cmd run build` in `ui/`, run `lit resolve` on a real conflicted merge, click Get proposal, Accept, Edit, Reject and Resolve, once with an API key set. The agent call has only been tested with mocked providers. (2) `.kiro/specs/` was never committed, so the PLAN tick for the Phase 0 specs is unsupported; the specs must come from Kiro's Specs panel. (3) The conflict-resolver agent exists only as prompt text in `.kiro/agents/`. (4) `ui/dist` is gitignored; README documents the build. (5) Prose conflicts are not shown in `lit resolve`. (6) No escape for a literal chunk reference in code. (7) Four-backtick fences, CRLF closing fences and trailing blank lines in a stitched chunk body are not lossless. (8) `ruff` has not been run (not installed). (9) No `.lit_resolved` backup is kept; recovery is via git index stages.
 
 ---
 

@@ -4,7 +4,7 @@
 work live in `.kiro/specs/<spec>/tasks.md`. Never duplicate a task across both.**
 
 Deadline: **Fri 4 Dec 2026, 14:00 PT = Sat 5 Dec 00:00 Athens**
-Status: Phase 3
+Status: Phase 4 done, Phase 3 gate and Phase 5 pending
 Days left: 24
 
 ---
@@ -122,3 +122,4 @@ Append only. One line per session: date, SHA, what moved, what is blocked.
 2026-11-14 · branch self-host · src/ migrated to lit/*.md (7 documents, 12 files, 69 chunks); lit tangle takes several documents and --check; parser now treats a plain fence body as prose; pre-commit hook blocks stale src/ (tested with Git bash) · open: self-host not merged to main, no escape for a literal chunk reference in code · bootstrap exception is over: edit lit/, not src/
 2026-11-14 · branch readme · README.md written (thesis, quickstart, commands, limits); tangle/stitch steps of the quickstart run in a scratch repo · open: quickstart's merge and resolve steps not re-run from a fresh install, self-host merged to main
 2026-11-14 · branch spec-in-format · grammar sections 1-6 moved into lit/format.md next to the parser chunks it describes (dropped the stale Chunk.refs line); format-grammar.md is now a pointer · Phase 4 done except the ui/dist decision
+2026-11-14 · 47d019b · all branches merged to main, 57/57 tests · deferred to next week (Phase 5 start): (1) manual Phase 3 gate pass in a browser, (2) .kiro/specs/ does not exist in git despite the Phase 0 tick, so create or recover format / merge-driver / resolve-ui through Kiro's Specs panel, (3) create the conflict-resolver agent in Kiro's UI, (4) video script and write-up drafts, (5) decide ui/dist (leaning: leave ignored, README documents the build)
