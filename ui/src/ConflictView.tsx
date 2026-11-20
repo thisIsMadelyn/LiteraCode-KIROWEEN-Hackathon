@@ -9,26 +9,41 @@ interface Props {
   onResolve: () => Promise<string | null>;
 }
 
+const SUBTITLES: Record<string, string> = {
+  Base: "common ancestor",
+  Ours: "your branch (HEAD)",
+  Theirs: "branch being merged in",
+};
+
+function Prose({ text, label }: { text: string; label: string }) {
+  return (
+    <pre className={text.trim() ? "prose" : "prose empty"} tabIndex={0} aria-label={label}>
+      {text.trim() || "no prose"}
+    </pre>
+  );
+}
+
 function Column({ title, side, base }: { title: string; side: Side; base?: Side }) {
   const lines = splitLines(side.body);
   const changed = base ? changedLines(splitLines(base.body), lines) : new Set<number>();
   return (
-    <section className="column" aria-labelledby={`h-${title}`}>
-      <h2 id={`h-${title}`}>{title}</h2>
-      <pre className="prose" tabIndex={0} aria-label={`${title}: prose before`}>
-        {side.prose_before || "(no prose)"}
-      </pre>
-      <pre className="code" tabIndex={0} aria-label={`${title}: code`}>
-        {lines.map((line, i) => (
-          <span key={i} className={changed.has(i) ? "line changed" : "line"}>
-            {line || " "}
-            {"\n"}
-          </span>
-        ))}
-      </pre>
-      <pre className="prose" tabIndex={0} aria-label={`${title}: prose after`}>
-        {side.prose_after || "(no prose)"}
-      </pre>
+    <section className={`column side-${title.toLowerCase()}`} aria-labelledby={`h-${title}`}>
+      <div className="column-head">
+        <h2 id={`h-${title}`}>{title}</h2>
+        <div className="column-sub">{SUBTITLES[title]}</div>
+      </div>
+      <div className="column-body">
+        <Prose text={side.prose_before} label={`${title}: prose before`} />
+        <pre className="code" tabIndex={0} aria-label={`${title}: code`}>
+          {lines.map((line, i) => (
+            <span key={i} className={changed.has(i) ? "line changed" : "line"}>
+              {line || " "}
+              {"\n"}
+            </span>
+          ))}
+        </pre>
+        <Prose text={side.prose_after} label={`${title}: prose after`} />
+      </div>
     </section>
   );
 }
@@ -84,29 +99,38 @@ export default function ConflictView({
 
   return (
     <main>
-      <h2 className="chunk-title">
-        Chunk <code>{conflict.chunk_id}</code>
-      </h2>
+      <div className="chunk-head">
+        <h2 className="chunk-title">
+          Chunk <code>{conflict.chunk_id}</code>
+        </h2>
+        <span className="badge-conflict">edited on both sides</span>
+      </div>
       <div className="columns">
         <Column title="Base" side={conflict.base} />
         <Column title="Ours" side={conflict.ours} base={conflict.base} />
         <Column title="Theirs" side={conflict.theirs} base={conflict.base} />
       </div>
-      <section className="proposal" aria-label="Agent proposal">
-        <button onClick={getProposal} disabled={loading}>
-          {loading ? "Asking the agent…" : "Get proposal"}
-        </button>
-        {error && <p role="alert">Could not get a proposal: {error}</p>}
+      <section className="card proposal" aria-label="Agent proposal">
+        <div className="card-head">
+          <div>
+            <h3>Agent proposal</h3>
+            <p className="card-hint">Shown as a diff against Ours. Nothing is written until you press Resolve.</p>
+          </div>
+          <button className="btn-primary" onClick={getProposal} disabled={loading}>
+            {loading ? "Asking the agent…" : "Get proposal"}
+          </button>
+        </div>
+        {error && <p role="alert" className="alert">Could not get a proposal: {error}</p>}
         {proposal && (
           <div>
             {proposal.source === "stub" && (
               <p className="note">Offline stub, not an agent proposal. {proposal.reasoning}</p>
             )}
             {proposal.proposal === null ? (
-              <p role="alert">The agent cannot resolve this conflict. Please resolve manually.</p>
+              <p role="alert" className="alert">The agent cannot resolve this conflict. Please resolve manually.</p>
             ) : (
               <>
-                <h3>Proposed change to Ours</h3>
+                <h4>Proposed change to Ours</h4>
                 <pre className="code diff" tabIndex={0} aria-label="Diff of proposal against Ours">
                   {diffLines(splitLines(conflict.ours.body), splitLines(proposal.proposal)).map(
                     (l, i) => (
@@ -119,23 +143,26 @@ export default function ConflictView({
                   )}
                 </pre>
                 <div className="actions">
-                  <button onClick={() => accept(false)}>Accept</button>
+                  <button className="btn-primary" onClick={() => accept(false)}>Accept</button>
                   <button onClick={() => accept(true)}>Edit</button>
-                  <button onClick={() => setProposal(null)}>Reject</button>
+                  <button className="btn-danger" onClick={() => setProposal(null)}>Reject</button>
                 </div>
               </>
             )}
             {proposal.source !== "stub" && (
               <>
-                <h3>Reasoning{proposal.confidence ? ` (confidence: ${proposal.confidence})` : ""}</h3>
+                <h4>Reasoning{proposal.confidence ? ` (confidence: ${proposal.confidence})` : ""}</h4>
                 <pre className="prose">{proposal.reasoning}</pre>
               </>
             )}
           </div>
         )}
       </section>
-      <section className="resolution">
-        <label htmlFor="resolution">Resolution (starts as the Ours body)</label>
+      <section className="card resolution">
+        <label htmlFor="resolution" className="label-block">
+          <span className="label-title">Resolution</span>
+          <span className="card-hint">Starts as the Ours body. This is exactly what gets written.</span>
+        </label>
         <textarea
           id="resolution"
           ref={textarea}
@@ -144,9 +171,9 @@ export default function ConflictView({
           rows={Math.max(6, resolution.split("\n").length + 1)}
           onChange={(e) => onResolutionChange(e.target.value)}
         />
-        {saveError && <p role="alert">Could not resolve: {saveError}</p>}
-        <div className="actions">
-          <button onClick={resolveNow} disabled={!resolution.trim() || saving}>
+        {saveError && <p role="alert" className="alert">Could not resolve: {saveError}</p>}
+        <div className="actions end">
+          <button className="btn-success" onClick={resolveNow} disabled={!resolution.trim() || saving}>
             {saving ? "Writing…" : "Resolve"}
           </button>
         </div>
