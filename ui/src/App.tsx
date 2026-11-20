@@ -43,44 +43,58 @@ export default function App() {
 
   if (done)
     return (
-      <div className="app">
-        <h1>All conflicts resolved.</h1>
-        <p>
-          Run <code>git add {file}</code> to stage the result. The server stops in a few seconds.
-        </p>
-        {done.prose > 0 && (
-          <p role="alert">
-            {done.prose} prose conflict(s) are still marked in the file with{" "}
-            <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; ours</code>. Edit them by hand before staging.
-          </p>
-        )}
+      <div className="center">
+        <div className="card">
+          <div className="done-icon" aria-hidden="true">✓</div>
+          <h1>All conflicts resolved.</h1>
+          <p>Stage the result to finish the merge:</p>
+          <div className="cmd">git add {file}</div>
+          <p className="card-hint">The server stops in a few seconds.</p>
+          {done.prose > 0 && (
+            <p role="alert" className="alert">
+              {done.prose} prose conflict(s) are still marked in the file with{" "}
+              <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; ours</code>. Edit them by hand before staging.
+            </p>
+          )}
+        </div>
       </div>
     );
-  if (error) return <p role="alert">Could not load conflicts: {error}</p>;
-  if (!conflicts) return <p>Loading…</p>;
-  if (conflicts.length === 0) return <p>No conflicts in this document.</p>;
+  if (error)
+    return (
+      <div className="center">
+        <p role="alert" className="alert">Could not load conflicts: {error}</p>
+      </div>
+    );
+  if (!conflicts) return <div className="center"><p className="card-hint">Loading…</p></div>;
+  if (conflicts.length === 0)
+    return <div className="center"><p className="card-hint">No conflicts in this document.</p></div>;
 
   const current = conflicts[index];
   const draft = drafts[current.chunk_id] ?? current.ours.body;
 
   return (
-    <div className="app">
-      <header>
-        <h1>lit resolve</h1>
+    <>
+      <header className="topbar">
+        <div className="topbar-inner">
+        <h1 className="brand">
+          <span><span className="brand-mark">lit</span> resolve</span>
+          <span className="brand-file">{file}</span>
+        </h1>
         <nav aria-label="Conflicts">
           <button onClick={() => setIndex(index - 1)} disabled={index === 0}>
-            Prev
+            ← Prev
           </button>
-          <span aria-live="polite">
+          <span className="counter" aria-live="polite">
             Conflict {index + 1} of {conflicts.length}
           </span>
           <button onClick={() => setIndex(index + 1)} disabled={index === conflicts.length - 1}>
-            Next
+            Next →
           </button>
           <ul className="jump">
             {conflicts.map((c, i) => (
               <li key={c.chunk_id}>
                 <button
+                  className="chip"
                   onClick={() => setIndex(i)}
                   aria-current={i === index ? "true" : undefined}
                 >
@@ -90,7 +104,9 @@ export default function App() {
             ))}
           </ul>
         </nav>
+        </div>
       </header>
+      <div className="app">
       <ConflictView
         key={current.chunk_id}
         conflict={current}
@@ -98,6 +114,7 @@ export default function App() {
         onResolutionChange={(v) => setDrafts({ ...drafts, [current.chunk_id]: v })}
         onResolve={() => resolve(current.chunk_id, draft)}
       />
-    </div>
+      </div>
+    </>
   );
 }
