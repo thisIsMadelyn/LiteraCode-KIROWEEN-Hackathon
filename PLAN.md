@@ -4,7 +4,7 @@
 work live in `.kiro/specs/<spec>/tasks.md`. Never duplicate a task across both.**
 
 Deadline: **Fri 4 Dec 2026, 14:00 PT = Sat 5 Dec 00:00 Athens**
-Status: Phase 4 done, Phase 3 gate and Phase 5 pending
+Status: Phases 0-4 done; Phase 5 pending (live-agent test still outstanding, no API key)
 Days left: 24
 
 ---
@@ -58,14 +58,14 @@ past this. ✅ Gate passed — all 22 tests green.
 **Gate:** Scenario A reproduces from two real branches, not a unit test. ✅ Gate passed — `git merge scenario-a-theirs` exits 0 with correct order and body.
 
 ### Phase 3 — the human surface (17–23 Nov)
-- [ ] `lit resolve` serves the React UI
+- [x] `lit resolve` serves the React UI
 - [x] three-way chunk view with surrounding prose
 - [x] conflict-resolver agent wired in, output is a reviewable diff
 - [x] accept / reject / hand-edit, writes the resolution
 
 **Gate:** Scenario B works end to end.
 
-**Gate status: PENDING manual sign-off (owner: user).** API path verified on real git; still to do by hand: build the UI (`npm.cmd run build` in `ui/`), run `lit resolve` on a real conflicted merge, click Get proposal / Accept / Edit / Reject / Resolve, and try once with an API key set. Tick this gate only after that pass.
+**Gate status: PASSED by hand, 2026-11 (no API key).** UI built, `lit resolve` run on a real conflicted merge, Get proposal (stub), Accept, Edit, Reject and Resolve all worked in a browser, then `git add` and commit. NOT covered: the live agent call (only mocked providers so far).
 
 ### Phase 4 — self-hosting and polish (24–29 Nov)
 - [x] migrate `src/` to literate sources under `lit/`
@@ -123,3 +123,4 @@ Append only. One line per session: date, SHA, what moved, what is blocked.
 2026-11-14 · branch readme · README.md written (thesis, quickstart, commands, limits); tangle/stitch steps of the quickstart run in a scratch repo · open: quickstart's merge and resolve steps not re-run from a fresh install, self-host merged to main
 2026-11-14 · branch spec-in-format · grammar sections 1-6 moved into lit/format.md next to the parser chunks it describes (dropped the stale Chunk.refs line); format-grammar.md is now a pointer · Phase 4 done except the ui/dist decision
 2026-11-14 · 47d019b · all branches merged to main, 57/57 tests · deferred to next week (Phase 5 start): (1) manual Phase 3 gate pass in a browser, (2) .kiro/specs/ does not exist in git despite the Phase 0 tick, so create or recover format / merge-driver / resolve-ui through Kiro's Specs panel, (3) create the conflict-resolver agent in Kiro's UI, (4) video script and write-up drafts, (5) decide ui/dist (leaning: leave ignored, README documents the build)
+2026-11 · f24d690 · manual Phase 3 gate pass in browser, stub path (no API key); spec literate-format-round-trip created in Kiro · open: live-agent test, merge-driver and resolve-ui specs, tangle --check reports false drift with absolute paths · next: remaining specs, conflict-resolver agent, video script and write-up
